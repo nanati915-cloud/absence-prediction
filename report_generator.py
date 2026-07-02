@@ -1,8 +1,7 @@
 from datetime import datetime
-from config import TEMPLATE_PATH, REPORT_DIR, REPORT_FILENAME_FORMAT
+from config import REPORT_DIR, REPORT_FILENAME_FORMAT
 from cell_map import CELL_MAP
-from excel_writer import ExcelWriter
-from text_builder import TextBuilder
+
 
 class ReportGenerator:
     """
@@ -11,19 +10,24 @@ class ReportGenerator:
     これにより、Excelのデザインやセルの位置が将来的に変更されても、このプログラムを1行も修正することなく対応できる
     高い「保守性」と「柔軟性」を実現しています。
     """
-    def __init__(self):
-        # 実行当日の日付（例: 20260701）を組み込んだユニークな出力ファイル名を動的に生成
+    def __init__(self, writer, cell_map, text_builder):
+        # 実行当日の日付を組み込んだユニークな出力ファイル名を動的に生成
         filename = REPORT_FILENAME_FORMAT.format(
             date=datetime.now().strftime("%Y%m%d")
         )
         self.output_path = REPORT_DIR / filename
         
-        # テンプレートをベースに、スタイル（フォントや色、罫線）を維持したまま上書きするためのWriterを初期化
-        self.writer = ExcelWriter(TEMPLATE_PATH, self.output_path)
+        # テンプレートをベースに、スタイルを維持したまま上書きするためのWriterを初期化
+        self.writer = writer
         
-        # 統計データから文脈に合わせた自然な日本語（考察文・業務改善提案）を動的生成するテキストビルダーを初期化
-        self.text = TextBuilder()
-
+        # 【修正】writer から読み込んだ workbook をインスタンスに保存
+        # これにより、後続の run() メソッド内で self.workbook を参照可能になります
+        self.workbook = self.writer.workbook 
+        
+        # 統計データから文脈に合わせた自然な日本語を動的生成するテキストビルダーを初期化
+        self.text = text_builder
+        
+        self.cell_map = cell_map
     def run(self, results, graph_data, monthly_df):
         print("レポート生成開始")
         today = datetime.now().strftime("%Y/%m/%d")
@@ -32,22 +36,25 @@ class ReportGenerator:
         # ■ 1. 「表紙」シート処理（トレーサビリティの担保）
         # ==================================================
         # レポートの発行日を動的に書き込み、帳票としての信頼性を確保します。
-        sheet, cell = CELL_MAP.get("cover_date", CELL_MAP.get("date"))
-        self.writer.write_cell(sheet, cell, today)
-
-        # ==================================================
+        sheet_name, cell_coord = CELL_MAP["cover_date"] # 例: ("表紙", "J44")
+        sheet_obj = self.workbook[sheet_name]           # 名前からシートの実体を取得
+        self.writer.write_cell(sheet_obj, cell_coord, today)
+        # --------------------------------------------------
         # ■ 2. 「2」シート：分析サマリー（経営層向けサマリー）
-        # ==================================================
-        # 園の経営層や施設長が「一目で全体の動向を把握できる」よう、
-        # 過去の傾向、未来の予測、業務への具体的なアクションプランを一箇所に集約。
-        sheet, cell = CELL_MAP["summary_trend"]
-        self.writer.write_cell(sheet, cell, self.text.trend_analysis(graph_data, results))
-        
-        sheet, cell = CELL_MAP["summary_future"]
-        self.writer.write_cell(sheet, cell, self.text.future_prediction_summary(graph_data, results))
-        
-        sheet, cell = CELL_MAP["summary_business"]
-        self.writer.write_cell(sheet, cell, self.text.business_improvement(graph_data, results))
+        # --------------------------------------------------
+        # CELL_MAPからシート名と番地を取り出す
+        sheet_name, cell_coord = CELL_MAP["summary_trend"]
+        # シート名からワークブック内のシートオブジェクトを取得
+        sheet = self.workbook[sheet_name]
+        self.writer.write_cell(sheet, cell_coord, self.text.trend_analysis(graph_data, results))
+
+        sheet_name, cell_coord = CELL_MAP["summary_future"]
+        sheet = self.workbook[sheet_name]
+        self.writer.write_cell(sheet, cell_coord, self.text.future_prediction_summary(graph_data, results))
+
+        sheet_name, cell_coord = CELL_MAP["summary_business"]
+        sheet = self.workbook[sheet_name]
+        self.writer.write_cell(sheet, cell_coord, self.text.business_improvement(graph_data, results))
 
         # ==================================================
         # ■ 3. 「3」〜「5」シート：過去統計分析グラフの自動挿入
@@ -78,12 +85,17 @@ class ReportGenerator:
         # ■ 4. 「6」シート：分析 傾向考察（現場保育士向けの示唆）
         # ==================================================
         # グラフから読み解くべき詳細な考察と、具体的な業務改善の提案テキストを埋め込みます。
-        sheet, cell = CELL_MAP["trend_analysis"]
-        self.writer.write_cell(sheet, cell, self.text.trend_analysis(graph_data, results))
+        
+        # 傾向考察の処理
+        sheet_name, cell_coord = CELL_MAP["trend_analysis"]
+        sheet = self.workbook[sheet_name]
+        self.writer.write_cell(sheet, cell_coord, self.text.trend_analysis(graph_data, results))
 
-        sheet, cell = CELL_MAP["business_improvement"]
-        self.writer.write_cell(sheet, cell, self.text.business_improvement(graph_data, results))
-
+        # 業務改善提案の処理
+        sheet_name, cell_coord = CELL_MAP["business_improvement"]
+        sheet = self.workbook[sheet_name]
+        self.writer.write_cell(sheet, cell_coord, self.text.business_improvement(graph_data, results))
+        
         # ==================================================
         # ■ 5. 「7」シート：分析⑦ 未来リスク（AIシミュレーション結果）
         # ==================================================
@@ -100,11 +112,16 @@ class ReportGenerator:
         # ■ 6. 「8」シート：総合（最終結論と意思決定の支援）
         # ==================================================
         # 統計とAI予測を包括した全体の総括、および最終的なネクストステップ（結論）を流し込みます。
-        sheet, cell = CELL_MAP["total_summary"]
-        self.writer.write_cell(sheet, cell, self.text.overall_summary(graph_data, results))
 
-        sheet, cell = CELL_MAP["total_conclusion"]
-        self.writer.write_cell(sheet, cell, self.text.final_conclusion(graph_data, results))
+        # 総合所見の処理
+        sheet_name, cell_coord = CELL_MAP["total_summary"]
+        sheet = self.workbook[sheet_name]
+        self.writer.write_cell(sheet, cell_coord, self.text.overall_summary(graph_data, results))
+
+        # 最終結論の処理
+        sheet_name, cell_coord = CELL_MAP["total_conclusion"]
+        sheet = self.workbook[sheet_name]
+        self.writer.write_cell(sheet, cell_coord, self.text.final_conclusion(graph_data, results))
 
         # ==================================================
         # ■ 7. ファイルの永続化とクローズ

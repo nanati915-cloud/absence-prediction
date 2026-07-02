@@ -9,24 +9,37 @@ class ExcelWriter:
     """
 
     def __init__(self, template_path, output_path):
+        self.template_path = template_path
+        self.output_path = output_path
         """
         初期化メソッド。
         あらかじめ用意したExcelの「報告書ひな形（テンプレート）」を読み込み、
         出力先パス（output_path）をクラス内に保持します。
         """
-        self.wb = load_workbook(template_path)
-        self.output_path = output_path
+        self.workbook = load_workbook(template_path)
 
     # ======================================================
     # ■ 1. 単一セルへのテキスト書き込み
     # ======================================================
-    def write_cell(self, sheet, cell, text):
+    # excel_writer.py の write_cell をこのように変更
+    def write_cell(self, ws, cell_coord, text):
         """
-        指定したシートの特定のセル（または結合セルの開始セル）にテキストを一括書き込みします。
-        報告書のタイトルや日付、総合所見（テキスト文章）などの流し込みに使用します。
+        ws: Worksheetオブジェクト（report_generatorから渡されたもの）
+        cell_coord: セル番地（文字列）
+        text: 書き込む内容
         """
-        ws = self.wb[sheet]
-        ws[cell] = text
+        # 座標からセルを取得
+        cell = ws[cell_coord]
+        
+        # 【重要】結合セルかどうかを判定し、結合なら左上のセルに書き込む
+        for merged_range in ws.merged_cells.ranges:
+            if cell.coordinate in merged_range:
+                # 結合範囲の左上のセル番地を取得して再取得
+                cell = ws.cell(row=merged_range.min_row, column=merged_range.min_col)
+                break
+                
+        # 値を書き込む
+        cell.value = text
 
     # ======================================================
     # ■ 2. 解析グラフ画像の一括挿入（自動縦横比維持機能）
@@ -41,7 +54,7 @@ class ExcelWriter:
         指定された横幅(width)に合わせて縦幅を整数値で動的にリサイズすることで、
         常に「人間の目で見やすい高精度なグラフレイアウト」を担保したままExcelに埋め込むことが可能です。
         """
-        ws = self.wb[sheet]
+        ws = self.workbook[sheet]
         img = Image(image_path)
 
         if height is None:
@@ -68,7 +81,7 @@ class ExcelWriter:
         「何行目の何列目からデータを展開するか（start_row, start_col）」を指定するだけで、
         大量の数値データをワンショットで表の中に綺麗に配置することができます。
         """
-        ws = self.wb[sheet]
+        ws = self.workbook[sheet]
         for i, row in enumerate(table):
             for j, value in enumerate(row):
                 ws.cell(
@@ -85,4 +98,4 @@ class ExcelWriter:
         メモリ上で編集・作成したすべてのデータ・画像・テキストを、
         事前にconfigで定義した出力パス（日付付きの成果物Excelファイル）として安全に物理保存します。
         """
-        self.wb.save(self.output_path)
+        self.workbook.save(self.output_path)

@@ -4,6 +4,7 @@ from train_model import train_model
 from predict import run_future_prediction
 from visualization import create_all_graphs, create_future_graphs
 from report_generator import ReportGenerator
+from config import TEMPLATE_PATH, REPORT_DIR, REPORT_FILENAME_FORMAT
 
 def main():
     """
@@ -83,12 +84,25 @@ def main():
     # ==========================================
     # ■ 6. 自動レポート生成 (成果物出力フェーズ)
     # ==========================================
-    # 自作したレポート生成モジュールを呼び出し、これまでの「統計分析結果」「AI予測値」
-    # 「生成されたすべてのグラフ」を、あらかじめ用意したExcelテンプレートへ自動流し込みします。
-    report = ReportGenerator()
+    from excel_writer import ExcelWriter
+    from cell_map import CELL_MAP
+    from text_builder import TextBuilder
+    from datetime import datetime # 日付取得用
+
+    # ① まず出力ファイル名をここで定義する
+    filename = REPORT_FILENAME_FORMAT.format(
+        date=datetime.now().strftime("%Y%m%d")
+    )
+    output_path = REPORT_DIR / filename
+    
+    # ② 定義した output_path を使って writer を作成
+    writer = ExcelWriter(TEMPLATE_PATH, output_path) 
+    
+    # ③ 部品をすべて渡して初期化し、実行
+    report = ReportGenerator(writer, CELL_MAP, TextBuilder())
     report.run(results, graph_data, monthly_df)
     
-    print("完了")
+    print(f"レポート出力完了: {output_path}")
 
 if __name__ == "__main__":
     main()

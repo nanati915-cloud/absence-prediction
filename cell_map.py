@@ -8,9 +8,9 @@ CELL_MAP = {
     "cover_date": ("表紙", "J44"),
 
     # 「2」シート：分析サマリー
-    "summary_trend": ("2", "B7"),        # 主な傾向 (B7～AC16)
-    "summary_future": ("2", "B20"),      # 未来予測結果 (B20～AC29)
-    "summary_business": ("2", "B33"),    # 業務への示唆 (B33～AC42)
+    "summary_trend": ("2", "B6"),        # 主な傾向 (B6～AC21)
+    "summary_future": ("2", "B24"),      # 未来予測結果 (B24～AC31)
+    "summary_business": ("2", "B35"),    # 業務への示唆 (B35～AC47)
 
     # 「3」シート
     "age_chart": ("3", "B4"),            # 分析① 月齢別 (B4～AC24)
@@ -25,8 +25,8 @@ CELL_MAP = {
     "month_chart": ("5", "B27"),         # 分析⑥ 月別推移 (B27～AC45)
 
     # 「6」シート：分析 傾向考察
-    "trend_analysis": ("6", "B6"),       # 考察 (B6～AC14)
-    "business_improvement": ("6", "B18"), # 業務改善提案 (B18～AC25)
+    "trend_analysis": ("6", "B6"),       # 考察 (B6～AC24)
+    "business_improvement": ("6", "B28"), # 業務改善提案 (B28～AC45)
 
     # 「7」シート：分析⑦ 未来リスク
     "future_risk_chart1": ("7", "B4"),   # 子供001 (B4〜)
