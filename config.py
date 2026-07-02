@@ -43,6 +43,7 @@ NUM_LEAVES = 31
 PREDICT_MONTHS = 24
 STABLE_THRESHOLD = 2
 STABLE_MONTHS = 6
+WINDOW_SIZE = 6
 
 # =========================================================
 # ■ 5. データサイエンス・欠損値処理ポリシーの設定

@@ -1,11 +1,11 @@
 import numpy as np
 import pandas as pd
-from config import IMPUTATION_METHOD
+from config import IMPUTATION_METHOD, WINDOW_SIZE
 
 # ==========================================================
 # ■ タイムウィンドウの設定（スライディングウィンドウ法）
 # ==========================================================
-WINDOW = 6
+
 
 def create_stability_dataset(monthly_df, child_name):
     """
@@ -48,15 +48,15 @@ def create_stability_dataset(monthly_df, child_name):
     y = []
 
     # トリミングした結果、入園後の在籍期間がウィンドウサイズ（6ヶ月）以下の場合はスキップ
-    if len(series) <= WINDOW:
+    if len(series) <= WINDOW_SIZE:
         return np.empty((0, 8)), np.empty((0,))
 
     # ------------------------------------------------------
     # 2. 特徴量エンジニアリング（統計的アプローチ）
     # ------------------------------------------------------
-    for i in range(WINDOW, len(series)):
+    for i in range(WINDOW_SIZE, len(series)):
         # 直近6ヶ月間のデータスライス（窓）を抽出
-        window = series.iloc[i - WINDOW:i]
+        window= series.iloc[i - WINDOW_SIZE:i]
 
         mean = window.mean()
         std = window.std()
