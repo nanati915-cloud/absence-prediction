@@ -118,7 +118,7 @@ def create_future_risk_curve(result, child_name):
 # ■ 5. 未来グラフの一括制御タスク
 # ==========================================================
 def create_future_graphs(results):
-    """園児ごとに独立したデータ構造を持つAI結果をループ処理し、各児童専用の未来予測グラフを全自動生成。"""
+    """子供ごとに独立したデータ構造を持つAI結果をループ処理し、各児童専用の未来予測グラフを全自動生成。"""
     for child, result in results.items():
         create_future_risk_curve(result, child)
     print("未来リスクグラフ出力完了")
