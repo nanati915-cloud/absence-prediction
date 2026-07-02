@@ -2,239 +2,127 @@ import pandas as pd
 
 class TextBuilder:
     """
-    【概要】多軸の統計データおよびAI予測結果を解釈し、Excel報告書に最適な動的テキストを自動生成する文章作成エンジン。
-    【アピール点】グラフ（視覚情報）とセル（帳票）を繋ぐ役割を持ち、データの「減少・増加・最大値」をアルゴリズムで判定して、
-    現場の職員がそのまま読める自然なビジネス報告文（自然言語生成）を出力します。
+    【概要】統計データの欠損を自動検知し、適切な文章のみを生成するレポート生成エンジン。
     """
 
-    # =====================================================
-    # ■ 1. 内部判定メソッド群（各グラフデータから局所的な傾向を抽出）
-    # =====================================================
+    def _is_valid(self, df, label):
+        """データが分析可能か厳格に判定するガード節"""
+        if df is None or df.empty:
+            return f"{label}のデータが不足しているため、傾向は判定できませんでした。"
+        
+        # 1. 数値化して余計な列（ラベル列）を無視
+        numeric_df = df.iloc[:, 1:].apply(pd.to_numeric, errors='coerce')
+        
+        # 2. 有効なデータが2つ以上あるか
+        if numeric_df.count().sum() < 2:
+            return f"{label}のデータが不足しているため、傾向は判定できませんでした。"
+        
+        # 3. さらに重要な点：平均値計算後の値にNaNがないかチェック
+        values = numeric_df.mean(axis=1)
+        if values.isna().any():
+            # 平均計算してもNaNが含まれる場合は、行としてデータ不十分とみなす
+            return f"{label}のデータが不足しているため、傾向は判定できませんでした。"
+            
+        return None
 
     def _age_trend(self, graph_data):
-        """月齢に応じた欠席傾向の動的判定"""
         df = graph_data.get("age_graph")
-        if df is None or df.empty or len(df) < 1:
-            return "月齢別のデータが不足しているため、傾向は判定できませんでした。"
-
+        err = self._is_valid(df, "月齢別")
+        if err: return err
+        
         values = df.iloc[:, 1:].mean(axis=1)
-
-        if len(values) < 2:
-            return "月齢別の比較に必要なデータが不足しています。"
-
-        first = float(values.iloc[0])
-        last = float(values.iloc[-1])
+        first, last = float(values.iloc[0]), float(values.iloc[-1])
         diff = first - last
-
+        
         if diff > 0.5:
-            return (
-                f"月齢が低い時期の平均欠席日数は約{first:.1f}日であり、"
-                f"成長後には約{last:.1f}日まで減少した。"
-                f"全体で約{diff:.1f}日の改善がみられ、成長に伴い欠席日数が減少する傾向が確認された。"
-            )
-
+            return f"月齢が低い時期の平均欠席日数は約{first:.1f}日であり、成長後には約{last:.1f}日まで減少した。全体で約{diff:.1f}日の改善がみられ、成長に伴い欠席日数が減少する傾向が確認された。"
         elif diff < -0.5:
-            return (
-                f"月齢が高くなるにつれて平均欠席日数は約{last:.1f}日となり、"
-                "欠席日数がやや増加する傾向が認められた。"
-            )
-
-        return (
-            f"月齢別の平均欠席日数は約{first:.1f}～{last:.1f}日で推移しており、"
-            "大きな差は認められなかった。"
-        )
+            return f"月齢が高くなるにつれて平均欠席日数は約{last:.1f}日となり、欠席日数がやや増加する傾向が認められた。"
+        return f"月齢別の平均欠席日数は約{first:.1f}～{last:.1f}日で推移しており、大きな差は認められなかった。"
 
     def _grade_trend(self, graph_data):
-        """所属クラス（学年）に応じた欠席傾向の動的判定"""
-
         df = graph_data.get("grade_graph")
-
-        if df is None or df.empty or len(df) < 1:
-            return "学年別のデータが不足しているため、傾向は判定できませんでした。"
+        err = self._is_valid(df, "学年別")
+        if err: return err
 
         values = df.iloc[:, 1:].mean(axis=1)
-
-        if len(values) < 2:
-            return "学年別の比較に必要なデータが不足しています。"
-
-        first = float(values.iloc[0])
-        last = float(values.iloc[-1])
+        first, last = float(values.iloc[0]), float(values.iloc[-1])
         diff = first - last
 
         if diff > 0.5:
-            return (
-                f"低学年の平均欠席日数は約{first:.1f}日であり、"
-                f"高学年では約{last:.1f}日まで減少した。"
-                f"全体で約{diff:.1f}日の改善がみられ、"
-                "進級に伴い欠席日数が減少する傾向が確認された。"
-            )
-
+            return f"低学年の平均欠席日数は約{first:.1f}日であり、高学年では約{last:.1f}日まで減少した。全体で約{diff:.1f}日の改善がみられ、進級に伴い欠席日数が減少する傾向が確認された。"
         elif diff < -0.5:
-            return (
-                f"高学年になるにつれて平均欠席日数は約{last:.1f}日となり、"
-                "欠席日数がやや増加する傾向が認められた。"
-            )
-
-        return (
-            f"学年別の平均欠席日数は約{first:.1f}～{last:.1f}日で推移しており、"
-            "学年間で大きな差は認められなかった。"
-        )
+            return f"高学年になるにつれて平均欠席日数は約{last:.1f}日となり、欠席日数がやや増加する傾向が認められた。"
+        return f"学年別の平均欠席日数は約{first:.1f}～{last:.1f}日で推移しており、学年間で大きな差は認められなかった。"
 
     def _attendance_trend(self, graph_data):
-        """登園月数に応じた欠席傾向の動的判定"""
-
         df = graph_data.get("attendance_graph")
-
-        if df is None or df.empty or len(df) < 1:
-            return "登園月数別のデータが不足しているため、傾向は判定できませんでした。"
+        err = self._is_valid(df, "登園月数別")
+        if err: return err
 
         values = df.iloc[:, 1:].mean(axis=1)
-
-        if len(values) < 2:
-            return "登園月数別の比較に必要なデータが不足しています。"
-
-        first = float(values.iloc[0])
-        last = float(values.iloc[-1])
+        first, last = float(values.iloc[0]), float(values.iloc[-1])
         diff = first - last
 
         if diff > 0.5:
-            return (
-                f"登園開始直後の平均欠席日数は約{first:.1f}日であり、"
-                f"登園月数の経過とともに約{last:.1f}日まで減少した。"
-                f"全体で約{diff:.1f}日の改善がみられ、"
-                "園生活への適応が進むにつれて欠席日数が減少する傾向が確認された。"
-            )
-
+            return f"登園開始直後の平均欠席日数は約{first:.1f}日であり、登園月数の経過とともに約{last:.1f}日まで減少した。全体で約{diff:.1f}日の改善がみられ、園生活への適応が進むにつれて欠席日数が減少する傾向が確認された。"
         elif diff < -0.5:
-            return (
-                f"登園月数の経過とともに平均欠席日数は約{last:.1f}日となり、"
-                "やや増加する傾向が認められた。"
-            )
-
-        return (
-            f"登園月数別の平均欠席日数は約{first:.1f}～{last:.1f}日で推移しており、"
-            "登園月数による大きな差は認められなかった。"
-        )
+            return f"登園月数の経過とともに平均欠席日数は約{last:.1f}日となり、やや増加する傾向が認められた。"
+        return f"登園月数別の平均欠席日数は約{first:.1f}～{last:.1f}日で推移しており、登園月数による大きな差は認められなかった。"
 
     def _year_trend(self, graph_data):
-        """在園年数に応じた体力の向上傾向を判定"""
-
         df = graph_data.get("years_graph")
-
-        if df is None or df.empty or len(df) < 1:
-            return "登園年数別のデータが不足しているため、傾向は判定できませんでした。"
+        err = self._is_valid(df, "登園年数別")
+        if err: return err
 
         values = df.iloc[:, 1:].mean(axis=1)
-
-        if len(values) < 2:
-            return "登園年数別の比較に必要なデータが不足しています。"
-
-        first = float(values.iloc[0])
-        last = float(values.iloc[-1])
+        first, last = float(values.iloc[0]), float(values.iloc[-1])
         diff = first - last
 
         if diff > 0.5:
-            return (
-                f"登園年数が短い時期の平均欠席日数は約{first:.1f}日であり、"
-                f"在園年数の増加とともに約{last:.1f}日まで減少した。"
-                f"全体で約{diff:.1f}日の改善がみられ、"
-                "園生活への適応や生活習慣の定着に伴い、欠席日数が減少する傾向が確認された。"
-            )
-
+            return f"登園年数が短い時期の平均欠席日数は約{first:.1f}日であり、在園年数の増加とともに約{last:.1f}日まで減少した。全体で約{diff:.1f}日の改善がみられ、園生活への適応に伴い欠席日数が減少する傾向が確認された。"
         elif diff < -0.5:
-            return (
-                f"登園年数の増加とともに平均欠席日数は約{last:.1f}日となり、"
-                "欠席日数がやや増加する傾向が認められた。"
-            )
-
-        return (
-            f"登園年数別の平均欠席日数は約{first:.1f}～{last:.1f}日で推移しており、"
-            "登園年数による大きな差は認められなかった。"
-        )
+            return f"登園年数の増加とともに平均欠席日数は約{last:.1f}日となり、欠席日数がやや増加する傾向が認められた。"
+        return f"登園年数別の平均欠席日数は約{first:.1f}～{last:.1f}日で推移しており、登園年数による大きな差は認められなかった。"
 
     def _season_trend(self, graph_data):
-        """
-        月別の欠席傾向から季節性を判定
-        """
-
         df = graph_data.get("month_graph")
+        err = self._is_valid(df, "月別（季節性）")
+        if err: return err
 
-        if df is None or df.empty or len(df) < 1:
-            return "月別の季節性データが不足しているため、傾向は判定できませんでした。"
+        # 1. 数値部分だけを計算
+        numeric_part = df.iloc[:, 1:]
+        values = numeric_part.mean(axis=1)
+        
+        # 2. 最大値の「位置（0〜n）」を取得する
+        # idxmax() はラベルを返すが、reset_indexで位置を特定する
+        pos = values.argmax() 
+        
+        # 3. 位置から月名を取得
+        peak_month = str(df.iloc[pos, 0])
+        
+        peak_value = float(values.max())
+        overall = float(values.mean())
 
-        values = df.iloc[:, 1:].mean(axis=1)
-
-        if values.empty:
-            return "月別データから平均値を算出できませんでした。"
-
-        idx = values.idxmax()
-
-        try:
-
-            if "月" in df.columns:
-                peak_month = str(df.loc[idx, "月"])
-            else:
-                peak_month = str(df.iloc[idx, 0])
-
-            peak_value = float(values.max())
-            overall = float(values.mean())
-
-            if peak_value - overall >= 0.5:
-                return (
-                    f"月別では{peak_month}の平均欠席日数が約{peak_value:.1f}日と最も高く、"
-                    "季節性による影響が比較的強く現れていることが示唆された。"
-                )
-
-            return (
-                f"月別では{peak_month}が最も高い傾向を示したが、"
-                "年間を通して大きな季節差は認められなかった。"
-            )
-
-        except Exception:
-            return "月別データから季節性を判定できませんでした。"
-
+        if peak_value - overall >= 0.5:
+            return f"月別では{peak_month}の平均欠席日数が約{peak_value:.1f}日と最も高く、季節性による影響が比較的強く現れていることが示唆された。"
+        return f"月別では{peak_month}が最も高い傾向を示したが、年間を通して大きな季節差は認められなかった。"
     def _monthly_trend(self, graph_data):
-        """直近の時系列データが全体として上向きか下向きかのモメンタムを判定"""
-
         df = graph_data.get("monthly_graph")
-
-        if df is None or df.empty or len(df) < 1:
-            return "月間推移のデータが不足しているため、傾向は判定できませんでした。"
+        err = self._is_valid(df, "月間推移")
+        if err: return err
 
         values = df.iloc[:, 1:].mean(axis=1)
-
-        if len(values) < 2:
-            return "月間推移を評価するためのデータが不足しています。"
-
-        first = float(values.iloc[0])
-        last = float(values.iloc[-1])
+        first, last = float(values.iloc[0]), float(values.iloc[-1])
         diff = first - last
 
         if diff > 0.5:
-            return (
-                f"月間平均欠席日数は約{first:.1f}日から約{last:.1f}日へ推移し、"
-                f"全体で約{diff:.1f}日の減少がみられた。"
-                "継続的な改善傾向が確認されている。"
-            )
-
+            return f"月間平均欠席日数は約{first:.1f}日から約{last:.1f}日へ推移し、全体で約{diff:.1f}日の減少がみられた。継続的な改善傾向が確認されている。"
         elif diff < -0.5:
-            return (
-                f"月間平均欠席日数は約{first:.1f}日から約{last:.1f}日へ推移し、"
-                f"約{abs(diff):.1f}日の増加がみられた。"
-                "今後も健康状態の継続的な観察が望まれる。"
-            )
-
-        return (
-            f"月間平均欠席日数は約{first:.1f}～{last:.1f}日で推移しており、"
-            "全体として大きな変動は認められなかった。"
-        )
-
-    # =====================================================
-    # ■ 2. 外部公開用メソッド群（各シートへ流し込む複合テキストの生成）
-    # =====================================================
+            return f"月間平均欠席日数は約{first:.1f}日から約{last:.1f}日へ推移し、約{abs(diff):.1f}日の増加がみられた。今後も継続的な健康観察が望まれる。"
+        return f"月間平均欠席日数は約{first:.1f}～{last:.1f}日で推移しており、全体として大きな変動は認められなかった。"
 
     def trend_analysis(self, graph_data, results):
-        """【シート2＆6】各軸の判定文を改行で結合し、包括的な『傾向考察』を一網打尽に生成します。"""
         return "\n".join([
             self._age_trend(graph_data),
             self._grade_trend(graph_data),
@@ -243,7 +131,8 @@ class TextBuilder:
             self._season_trend(graph_data),
             self._monthly_trend(graph_data)
         ])
-
+    
+    
     def future_prediction_summary(self, graph_data, results):
         """【シート2】AIモデルによる個別児童の未来予測結果を生成"""
 
