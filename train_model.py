@@ -1,56 +1,68 @@
 from lightgbm import LGBMRegressor
 from config import RANDOM_STATE
 
+
+def _create_model(objective="regression", alpha=None):
+    """
+    LightGBMモデル生成
+    """
+
+    params = {
+        "objective": objective,
+        "n_estimators": 300,
+        "learning_rate": 0.05,
+        "max_depth": 5,
+        "num_leaves": 31,
+        "min_child_samples": 5,
+        "subsample": 0.8,
+        "colsample_bytree": 0.8,
+        "random_state": RANDOM_STATE,
+        "verbose": -1,
+    }
+
+    if objective == "quantile":
+        params["alpha"] = alpha
+
+    return LGBMRegressor(**params)
+
+
 def train_model(X, y):
     """
-    【概要】最先端の勾配ブースティング木アルゴリズム「LightGBM」を用いた、欠席日数予測モデルの学習関数。
-    
-    【選定理由】
-    時系列の統計特徴量（平均、トレンド、直近差分など）の非線形な関係性を高速かつ高精度に学習させるため、
-    スマートフォンのアプリや企業のデータ分析現場でデファクトスタンダードとなっている LightGBM を採用。
-    
-    Parameters
-    ----------
-    X : DataFrame or ndarray
-        統計特徴量行列（8次元の特徴量空間）
-    y : Series or ndarray
-        教師ターゲット（「翌月の欠席日数」という正解の実数値）
-    
+    回帰モデルと予測区間モデルを学習する。
+
     Returns
     -------
-    model : LGBMRegressor
-        最適化が完了した、子供の個別の学習済み予測モデルオブジェクト
+    dict
+        {
+            "median": 中央値予測モデル,
+            "lower": 下限予測モデル(5%),
+            "upper": 上限予測モデル(95%)
+        }
     """
+
     if len(X) == 0:
-        raise ValueError("学習データがありません。データの準備状況（データ件数）を確認してください。")
+        raise ValueError("学習データがありません。")
 
-    # ==========================================================
-    # ■ 機械学習ハイパーパラメータの設定
-    # ==========================================================
-    # 今回の「子供ごとの限られた過去データ」という小規模データ特性に合わせ、
-    # 『過学習（過剰適合）の徹底防止』と『予測の滑らかさ』を両立させる緻密なチューニングを施しています。
-    model = LGBMRegressor(
-        objective="regression",     # タスク設定：欠席日数という連続数値を当てる「回帰問題」を指定
-        n_estimators=300,           # 弱学習器（決定木）の構築回数。学習率とのバランスを考慮した十分な回数
-        learning_rate=0.05,         # 学習率。小さめに設定（0.05）することで、予測のブレを抑えジワジワと確実に最適化
-        
-        # --- 過学習防止のための構造制約パラメータ ---
-        max_depth=5,                # 木の最大深さを「5」に制限。モデルが複雑になりすぎて過去データに依存しすぎるのを防止
-        num_leaves=31,              # 1つの木の中の最大葉ノード数。深さ5に対して適切な表現力を担保
-        min_child_samples=5,        # 1つの葉に入る最小データ数。データが少ない今回のタスク向けに、通常（20）より小さくして柔軟性を確保
-        
-        # --- ランダム性（ロバスト性）を高めるアンサンブル設定 ---
-        subsample=0.8,              # 各決定木の学習に使う行データの割合（80%）。データのノイズに対する耐性を向上
-        colsample_bytree=0.8,       # 各決定木の学習に使う列（特徴量）の割合（80%）。特定の特徴量（例: meanのみ）への過剰依存を防止
-        
-        random_state=RANDOM_STATE,  # 乱数シードの固定。発表時や再実験時に、何度実行しても「全く同じ再現性」を持たせるための設定
-        verbose=-1                  # ログ出力制御。学習中の膨大なデバッグ情報を非表示にし、コンソールをクリーンに保つ
+    # 中央値（通常予測）
+    median_model = _create_model()
+    median_model.fit(X, y)
+
+    # 下限5%
+    lower_model = _create_model(
+        objective="quantile",
+        alpha=0.05
     )
+    lower_model.fit(X, y)
 
-    # ==========================================================
-    # ■ AIモデルの学習実行（フィッティング）
-    # ==========================================================
-    # 特徴量 X から ターゲット y を導き出すための「決定木の分岐ルール」を、アルゴリズムが自動で最適化します。
-    model.fit(X, y)
+    # 上限95%
+    upper_model = _create_model(
+        objective="quantile",
+        alpha=0.95
+    )
+    upper_model.fit(X, y)
 
-    return model
+    return {
+        "median": median_model,
+        "lower": lower_model,
+        "upper": upper_model,
+    }

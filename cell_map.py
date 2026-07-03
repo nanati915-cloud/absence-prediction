@@ -8,9 +8,9 @@ CELL_MAP = {
     "cover_date": ("表紙", "J44"),
 
     # 「2」シート：分析サマリー
-    "summary_trend": ("2", "B6"),        # 主な傾向 (B6～AC21)
-    "summary_future": ("2", "B24"),      # 未来予測結果 (B24～AC31)
-    "summary_business": ("2", "B35"),    # 業務への示唆 (B35～AC47)
+    "summary_trend": ("2", "B6"),        # 主な傾向 (B6～AC24)
+    "summary_future": ("2", "B27"),      # 未来予測結果 (B27～AC35)
+    "summary_business": ("2", "B39"),    # 業務への示唆 (B39～AC47)
 
     # 「3」シート
     "age_chart": ("3", "B4"),            # 分析① 月齢別 (B4～AC24)
