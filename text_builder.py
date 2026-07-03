@@ -37,14 +37,14 @@ class TextBuilder:
         if len(values) < 2:
             return None
 
-        first = float(values.iloc[0])
-        last = float(values.iloc[-1])
+        first = int(values.iloc[0])
+        last = int(values.iloc[-1])
         diff = first - last
 
         if diff > 0.5:
-            return f"月齢が上がるにつれて欠席日数は約{first:.1f}日から約{last:.1f}日へ減少した。"
+            return f"月齢が上がるにつれて欠席日数は{first}日から{last}日へ減少した。"
         elif diff < -0.5:
-            return f"月齢が上がるにつれて欠席日数は約{first:.1f}日から約{last:.1f}日へ増加した。"
+            return f"月齢が上がるにつれて欠席日数は{first}日から{last}日へ増加した。"
 
         return "月齢による欠席日数の大きな変化は認められなかった。"
     def _grade_trend(self, graph_data, child):
@@ -56,14 +56,14 @@ class TextBuilder:
         if len(values) < 2:
             return None
 
-        first = float(values.iloc[0])
-        last = float(values.iloc[-1])
+        first = int(values.iloc[0])
+        last = int(values.iloc[-1])
         diff = first - last
 
         if diff > 0.5:
-            return f"学年が上がるにつれて欠席日数は約{first:.1f}日から約{last:.1f}日へ減少した。"
+            return f"学年が上がるにつれて欠席日数は{first}日から{last}日へ減少した。"
         elif diff < -0.5:
-            return f"学年が上がるにつれて欠席日数は約{first:.1f}日から約{last:.1f}日へ増加した。"
+            return f"学年が上がるにつれて欠席日数は{first}日から{last}日へ増加した。"
 
         return "学年による欠席日数の大きな変化は認められなかった。"
 
@@ -76,14 +76,14 @@ class TextBuilder:
         if len(values) < 2:
             return None
 
-        first = float(values.iloc[0])
-        last = float(values.iloc[-1])
+        first = int(values.iloc[0])
+        last = int(values.iloc[-1])
         diff = first - last
 
         if diff > 0.5:
-            return f"登園月数の経過に伴い欠席日数は約{first:.1f}日から約{last:.1f}日へ減少した。"
+            return f"登園月数の経過に伴い欠席日数は{first}日から{last}日へ減少した。"
         elif diff < -0.5:
-            return f"登園月数の経過に伴い欠席日数は約{first:.1f}日から約{last:.1f}日へ増加した。"
+            return f"登園月数の経過に伴い欠席日数は{first}日から{last}日へ増加した。"
 
         return "登園月数による欠席日数の大きな変化は認められなかった。"
     
@@ -96,14 +96,14 @@ class TextBuilder:
         if len(values) < 2:
             return None
 
-        first = float(values.iloc[0])
-        last = float(values.iloc[-1])
+        first = int(values.iloc[0])
+        last = int(values.iloc[-1])
         diff = first - last
 
         if diff > 0.5:
-            return f"登園年数の経過に伴い欠席日数は約{first:.1f}日から約{last:.1f}日へ減少した。"
+            return f"登園年数の経過に伴い欠席日数は{first}日から{last}日へ減少した。"
         elif diff < -0.5:
-            return f"登園年数の経過に伴い欠席日数は約{first:.1f}日から約{last:.1f}日へ増加した。"
+            return f"登園年数の経過に伴い欠席日数は{first}日から{last}日へ増加した。"
 
         return "登園年数による欠席日数の大きな変化は認められなかった。"
 
@@ -118,11 +118,11 @@ class TextBuilder:
 
         peak_idx = values.idxmax()
         peak_month = df.loc[peak_idx, df.columns[0]]
-        peak_value = float(values.max())
-        average = float(values.mean())
+        peak_value = int(values.max())
+        average = int(values.mean())
 
         if peak_value - average >= 0.5:
-            return f"{peak_month}の欠席日数が約{peak_value:.1f}日と最も高く、季節性の影響がみられた。"
+            return f"{peak_month}の欠席日数が{peak_value}日と最も高く、季節性の影響がみられた。"
 
         return "年間を通して大きな季節性は認められなかった。"
 
@@ -135,14 +135,14 @@ class TextBuilder:
         if len(values) < 2:
             return None
 
-        first = float(values.iloc[0])
-        last = float(values.iloc[-1])
+        first = int(values.iloc[0])
+        last = int(values.iloc[-1])
         diff = first - last
 
         if diff > 0.5:
-            return f"月間推移では欠席日数が約{first:.1f}日から約{last:.1f}日へ減少した。"
+            return f"月間推移では欠席日数が{first}日から{last}日へ減少した。"
         elif diff < -0.5:
-            return f"月間推移では欠席日数が約{first:.1f}日から約{last:.1f}日へ増加した。"
+            return f"月間推移では欠席日数が{first}日から{last}日へ増加した。"
 
         return "月間推移に大きな変化は認められなかった。"
     
@@ -240,7 +240,7 @@ class TextBuilder:
             if stable is not None:
                 lines.append(
                     f"平均欠席日数は約{avg:.1f}日と予測された。"
-                    f"約{stable}か月後に安定が見込まれるため、それまでは健康観察と家庭との情報共有を継続することが望ましい。"
+                    f"約{stable}か月後に安定が見込まれるため、それまでは健康観察と、家庭と保育園・学校との情報共有を継続することが望ましい。"
                 )
             else:
                 lines.append(
@@ -273,7 +273,7 @@ class TextBuilder:
         if stable_count == total:
             text += "全員が予測期間内に安定化すると予測され、現在の健康管理を継続することが望まれる。"
         elif stable_count == 0:
-            text += "予測期間内に安定化が見込まれる児童はおらず、継続的な健康観察と家庭との連携が重要と考えられる。"
+            text += "予測期間内に安定化が見込まれる児童はおらず、継続的な健康観察と、家庭と保育園・学校との連携が重要と考えられる。"
         else:
             text += (
                 f"{stable_count}名は予測期間内に安定化が見込まれ、"
@@ -298,10 +298,10 @@ class TextBuilder:
             return (
                 f"AI予測では対象児童{total}名中{len(stable)}名で予測期間内の安定化が見込まれた。"
                 f"最も早い児童は約{earliest}か月後に安定すると予測された。"
-                "今後も健康観察と家庭との情報共有を継続し、児童ごとの状況に応じた支援を行うことが望まれる。"
+                "今後も健康観察と、家庭と保育園・学校との情報共有を継続し、児童ごとの状況に応じた支援を行うことが望まれる。"
             )
 
         return (
             "AI予測では予測期間内に安定化が見込まれる児童は確認されなかった。"
-            "継続的な健康観察と家庭との情報共有を行いながら、個々の状況に応じた支援を継続することが望まれる。"
+            "継続的な健康観察と、家庭と保育園・学校との情報共有を行いながら、個々の状況に応じた支援を継続することが望まれる。"
         )

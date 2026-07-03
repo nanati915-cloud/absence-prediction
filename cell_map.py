@@ -24,13 +24,13 @@ CELL_MAP = {
     "monthly_chart": ("5", "B4"),        # 分析⑤ 月間 (B4～AC24)
     "month_chart": ("5", "B27"),         # 分析⑥ 月別推移 (B27～AC45)
 
-    # 「6」シート：分析 傾向考察
-    "trend_analysis": ("6", "B6"),       # 考察 (B6～AC24)
-    "business_improvement": ("6", "B28"), # 業務改善提案 (B28～AC45)
+    # 「6」シート：分析⑦ 未来リスク
+    "future_risk_chart1": ("6", "B4"),   # 子供001 (B4〜)
+    "future_risk_chart2": ("6", "B16"),  # 子供002 (B16〜 縦並び用)
 
-    # 「7」シート：分析⑦ 未来リスク
-    "future_risk_chart1": ("7", "B4"),   # 子供001 (B4〜)
-    "future_risk_chart2": ("7", "B16"),  # 子供002 (B16〜 縦並び用)
+    # 「7」シート：分析 傾向考察
+    "trend_analysis": ("7", "B6"),       # 考察 (B6～AC24)
+    "business_improvement": ("7", "B28"), # 業務改善提案 (B28～AC45)
 
     # 「8」シート
     "total_summary": ("8", "B4"),        # 総合所見 (B4～AC11)
