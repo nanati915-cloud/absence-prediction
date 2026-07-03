@@ -34,7 +34,7 @@ def noise(scale):
     return np.random.normal(0, scale)
 
 # =================================================
-# ■ 3. 【核心】時系列マスターデータの生成
+# ■ 3. 時系列マスターデータの生成
 # =================================================
 def generate_master_timeline(length=61):
     master_records = []
@@ -131,7 +131,7 @@ def export_excel():
             ws.cell(row=3+y, column=23+c_idx, value=sum(vals))
 
     wb.save("欠席.xlsx")
-    print("【整合性検証済・合計出力完了】生成完了：欠席.xlsx")
+    print("生成完了：欠席.xlsx")
 
 if __name__ == "__main__":
     export_excel()

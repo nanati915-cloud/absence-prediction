@@ -4,7 +4,7 @@ from openpyxl.drawing.image import Image
 class ExcelWriter:
     """
     【概要】分析結果をExcel帳票（テンプレート）へ出力するための専用汎用クラス
-    【アピール点】データの集計ロジックとExcelの操作・描画ロジックを完全に分離（カプセル化）することで、
+    データの集計ロジックとExcelの操作・描画ロジックを完全に分離（カプセル化）することで、
     将来的にデザインやレイアウト変更があっても、このクラスを呼び出すメイン側のコードを一切汚さずに修正できる設計にしています。
     """
 
@@ -31,7 +31,7 @@ class ExcelWriter:
         # 座標からセルを取得
         cell = ws[cell_coord]
         
-        # 【重要】結合セルかどうかを判定し、結合なら左上のセルに書き込む
+        # 結合セルかどうかを判定し、結合なら左上のセルに書き込む
         for merged_range in ws.merged_cells.ranges:
             if cell.coordinate in merged_range:
                 # 結合範囲の左上のセル番地を取得して再取得

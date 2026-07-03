@@ -6,7 +6,7 @@ from cell_map import CELL_MAP
 class ReportGenerator:
     """
     【概要】AIの分析・予測結果、および可視化した全グラフを、Excelテンプレートへ自動流し込みする帳票生成エンジン。
-    【アピール点】データ（ロジック）と、Excelの配置情報（レイアウト）を『CELL_MAP』を介して完全分離しています。
+    データ（ロジック）と、Excelの配置情報（レイアウト）を『CELL_MAP』を介して完全分離しています。
     これにより、Excelのデザインやセルの位置が将来的に変更されても、このプログラムを1行も修正することなく対応できる
     高い「保守性」と「柔軟性」を実現しています。
     """
@@ -20,8 +20,7 @@ class ReportGenerator:
         # テンプレートをベースに、スタイルを維持したまま上書きするためのWriterを初期化
         self.writer = writer
         
-        # 【修正】writer から読み込んだ workbook をインスタンスに保存
-        # これにより、後続の run() メソッド内で self.workbook を参照可能になります
+        # writer から読み込んだ workbook をインスタンスに保存
         self.workbook = self.writer.workbook 
         
         # 統計データから文脈に合わせた自然な日本語を動的生成するテキストビルダーを初期化
@@ -36,7 +35,7 @@ class ReportGenerator:
         # ■ 1. 「表紙」シート処理（トレーサビリティの担保）
         # ==================================================
         # レポートの発行日を動的に書き込み、帳票としての信頼性を確保します。
-        sheet_name, cell_coord = CELL_MAP["cover_date"] # 例: ("表紙", "J44")
+        sheet_name, cell_coord = CELL_MAP["cover_date"] 
         sheet_obj = self.workbook[sheet_name]           # 名前からシートの実体を取得
         self.writer.write_cell(sheet_obj, cell_coord, today)
         # --------------------------------------------------
@@ -82,7 +81,7 @@ class ReportGenerator:
         self.writer.insert_image(sheet, "output/graphs/月別欠席日数.png", cell=cell, width=520, height=None)
 
         # ==================================================
-        # ■ 4. 「6」シート：分析 傾向考察（現場保育士向けの示唆）
+        # ■ 4. 「6」シート：分析 傾向考察
         # ==================================================
         # グラフから読み解くべき詳細な考察と、具体的な業務改善の提案テキストを埋め込みます。
         

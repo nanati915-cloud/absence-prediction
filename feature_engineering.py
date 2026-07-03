@@ -10,7 +10,7 @@ from config import IMPUTATION_METHOD, WINDOW_SIZE
 def create_stability_dataset(monthly_df, child_name):
     """
     【概要】生系列データから、入園前期間を除外し、入園後の欠損値を適切に補完した上で特徴量を生成します。
-    【妥当性】入園前のデータを一律0埋めせず削除することで、免疫獲得トレンドの歪みを防止します。
+    入園前のデータを一律0埋めせず削除することで、免疫獲得トレンドの歪みを防止します。
     """
     # 対象児童の時系列データを取得
     raw_series = monthly_df[child_name].copy()
