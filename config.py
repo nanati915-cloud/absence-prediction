@@ -16,17 +16,14 @@ TEMPLATE_PATH = TEMPLATE_DIR / "報告書ひな形.xlsx"
 
 OUTPUT_DIR = BASE_DIR / "output"
 GRAPH_DIR = OUTPUT_DIR / "graphs"
-PREDICTION_DIR = OUTPUT_DIR / "predictions"
 REPORT_DIR = OUTPUT_DIR / "reports"
-MODEL_DIR = BASE_DIR / "models"
 
 # =========================================================
 # ■ 2. 環境の自動初期化（フォルダ自動生成）
 # =========================================================
 GRAPH_DIR.mkdir(parents=True, exist_ok=True)
-PREDICTION_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_DIR.mkdir(parents=True, exist_ok=True)
-MODEL_DIR.mkdir(parents=True, exist_ok=True)
+
 
 # =========================================================
 # ■ 3. 機械学習（LightGBM）のハイパーパラメータ設定
