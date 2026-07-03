@@ -42,11 +42,11 @@ class TextBuilder:
         diff = first - last
 
         if diff > 0.5:
-            return f"月齢が上がるにつれて平均欠席日数は約{first:.1f}日から約{last:.1f}日へ減少した。"
+            return f"月齢が上がるにつれて欠席日数は約{first:.1f}日から約{last:.1f}日へ減少した。"
         elif diff < -0.5:
-            return f"月齢が上がるにつれて平均欠席日数は約{first:.1f}日から約{last:.1f}日へ増加した。"
+            return f"月齢が上がるにつれて欠席日数は約{first:.1f}日から約{last:.1f}日へ増加した。"
 
-        return "月齢による平均欠席日数の大きな変化は認められなかった。"
+        return "月齢による欠席日数の大きな変化は認められなかった。"
     def _grade_trend(self, graph_data, child):
         df = graph_data.get("grade_graph")
         if not self._is_valid(df):
@@ -61,11 +61,11 @@ class TextBuilder:
         diff = first - last
 
         if diff > 0.5:
-            return f"学年が上がるにつれて平均欠席日数は約{first:.1f}日から約{last:.1f}日へ減少した。"
+            return f"学年が上がるにつれて欠席日数は約{first:.1f}日から約{last:.1f}日へ減少した。"
         elif diff < -0.5:
-            return f"学年が上がるにつれて平均欠席日数は約{first:.1f}日から約{last:.1f}日へ増加した。"
+            return f"学年が上がるにつれて欠席日数は約{first:.1f}日から約{last:.1f}日へ増加した。"
 
-        return "学年による平均欠席日数の大きな変化は認められなかった。"
+        return "学年による欠席日数の大きな変化は認められなかった。"
 
     def _attendance_trend(self, graph_data, child):
         df = graph_data.get("attendance_graph")
@@ -81,11 +81,11 @@ class TextBuilder:
         diff = first - last
 
         if diff > 0.5:
-            return f"登園月数の経過に伴い平均欠席日数は約{first:.1f}日から約{last:.1f}日へ減少した。"
+            return f"登園月数の経過に伴い欠席日数は約{first:.1f}日から約{last:.1f}日へ減少した。"
         elif diff < -0.5:
-            return f"登園月数の経過に伴い平均欠席日数は約{first:.1f}日から約{last:.1f}日へ増加した。"
+            return f"登園月数の経過に伴い欠席日数は約{first:.1f}日から約{last:.1f}日へ増加した。"
 
-        return "登園月数による平均欠席日数の大きな変化は認められなかった。"
+        return "登園月数による欠席日数の大きな変化は認められなかった。"
     
     def _year_trend(self, graph_data, child):
         df = graph_data.get("years_graph")
@@ -101,11 +101,11 @@ class TextBuilder:
         diff = first - last
 
         if diff > 0.5:
-            return f"登園年数の経過に伴い平均欠席日数は約{first:.1f}日から約{last:.1f}日へ減少した。"
+            return f"登園年数の経過に伴い欠席日数は約{first:.1f}日から約{last:.1f}日へ減少した。"
         elif diff < -0.5:
-            return f"登園年数の経過に伴い平均欠席日数は約{first:.1f}日から約{last:.1f}日へ増加した。"
+            return f"登園年数の経過に伴い欠席日数は約{first:.1f}日から約{last:.1f}日へ増加した。"
 
-        return "登園年数による平均欠席日数の大きな変化は認められなかった。"
+        return "登園年数による欠席日数の大きな変化は認められなかった。"
 
     def _season_trend(self, graph_data, child):
         df = graph_data.get("month_graph")
@@ -122,7 +122,7 @@ class TextBuilder:
         average = float(values.mean())
 
         if peak_value - average >= 0.5:
-            return f"{peak_month}の平均欠席日数が約{peak_value:.1f}日と最も高く、季節性の影響がみられた。"
+            return f"{peak_month}の欠席日数が約{peak_value:.1f}日と最も高く、季節性の影響がみられた。"
 
         return "年間を通して大きな季節性は認められなかった。"
 
@@ -140,9 +140,9 @@ class TextBuilder:
         diff = first - last
 
         if diff > 0.5:
-            return f"月間推移では平均欠席日数が約{first:.1f}日から約{last:.1f}日へ減少した。"
+            return f"月間推移では欠席日数が約{first:.1f}日から約{last:.1f}日へ減少した。"
         elif diff < -0.5:
-            return f"月間推移では平均欠席日数が約{first:.1f}日から約{last:.1f}日へ増加した。"
+            return f"月間推移では欠席日数が約{first:.1f}日から約{last:.1f}日へ増加した。"
 
         return "月間推移に大きな変化は認められなかった。"
     
