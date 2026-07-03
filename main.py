@@ -5,6 +5,10 @@ from predict import run_future_prediction
 from visualization import create_all_graphs, create_future_graphs
 from report_generator import ReportGenerator
 from config import TEMPLATE_PATH, REPORT_DIR, REPORT_FILENAME_FORMAT
+from excel_writer import ExcelWriter
+from cell_map import CELL_MAP
+from text_builder import TextBuilder
+from datetime import datetime # 日付取得用
 
 def main():
     """
@@ -82,11 +86,6 @@ def main():
     # ==========================================
     # ■ 6. 自動レポート生成 (成果物出力フェーズ)
     # ==========================================
-    from excel_writer import ExcelWriter
-    from cell_map import CELL_MAP
-    from text_builder import TextBuilder
-    from datetime import datetime # 日付取得用
-
     # ① まず出力ファイル名をここで定義する
     filename = REPORT_FILENAME_FORMAT.format(
         date=datetime.now().strftime("%Y%m%d")
