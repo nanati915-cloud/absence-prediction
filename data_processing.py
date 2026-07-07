@@ -1,5 +1,5 @@
 import pandas as pd
-from config import EXCEL_FILE, SHEET_NAME
+from config import EXCEL_FILE, SHEET_NAME ,CHILDREN
 
 
 # =========================================================
@@ -46,49 +46,49 @@ def build_graph_data(df):
 #月齢
 def extract_age_graph(df):
     sub = df.iloc[2:75, 1:4].copy()
-    sub.columns = ["月齢", "子供001", "子供002"]
-    sub["子供001"] = pd.to_numeric(sub["子供001"], errors="coerce")
-    sub["子供002"] = pd.to_numeric(sub["子供002"], errors="coerce")
+    sub.columns = ["月齢"] + CHILDREN
+    for child in CHILDREN:
+        sub[child] = pd.to_numeric(sub[child], errors="coerce")
     return sub
 
 #登園月数
 def extract_attendance_graph(df):
     sub = df.iloc[2:63, 5:8].copy()
-    sub.columns = ["登園月数", "子供001", "子供002"]
-    sub["子供001"] = pd.to_numeric(sub["子供001"], errors="coerce")
-    sub["子供002"] = pd.to_numeric(sub["子供002"], errors="coerce")
+    sub.columns = ["登園月数"] + CHILDREN
+    for child in CHILDREN:
+        sub[child] = pd.to_numeric(sub[child], errors="coerce")
     return sub
 
 #月間
 def extract_month_graph(df):
     sub = df.iloc[2:63, 9:12].copy()
-    sub.columns = ["期間", "子供001", "子供002"]
-    sub["子供001"] = pd.to_numeric(sub["子供001"], errors="coerce")
-    sub["子供002"] = pd.to_numeric(sub["子供002"], errors="coerce")
+    sub.columns = ["期間"] + CHILDREN
+    for child in CHILDREN:
+        sub[child] = pd.to_numeric(sub[child], errors="coerce")
     return sub
 
 #月
 def extract_month_summary(df):
     sub = df.iloc[2:14, 13:16].copy()
-    sub.columns = ["月", "子供001", "子供002"]
-    sub["子供001"] = pd.to_numeric(sub["子供001"], errors="coerce")
-    sub["子供002"] = pd.to_numeric(sub["子供002"], errors="coerce")
+    sub.columns = ["月"] + CHILDREN
+    for child in CHILDREN:
+        sub[child] = pd.to_numeric(sub[child], errors="coerce")
     return sub
 
 #学年
 def extract_grade_graph(df):
     sub = df.iloc[2:9, 17:20].copy()
-    sub.columns = ["クラス", "子供001", "子供002"]
-    sub["子供001"] = pd.to_numeric(sub["子供001"], errors="coerce")
-    sub["子供002"] = pd.to_numeric(sub["子供002"], errors="coerce")
+    sub.columns = ["クラス"] + CHILDREN
+    for child in CHILDREN:
+        sub[child] = pd.to_numeric(sub[child], errors="coerce")
     return sub
 
 #登園年数
 def extract_years_graph(df):
     sub = df.iloc[2:8, 21:24].copy()
-    sub.columns = ["登園年数", "子供001", "子供002"]
-    sub["子供001"] = pd.to_numeric(sub["子供001"], errors="coerce")
-    sub["子供002"] = pd.to_numeric(sub["子供002"], errors="coerce")
+    sub.columns = ["登園年数"] + CHILDREN
+    for child in CHILDREN:
+        sub[child] = pd.to_numeric(sub[child], errors="coerce")
     return sub
 
 
