@@ -3,9 +3,6 @@ import matplotlib.pyplot as plt
 import japanize_matplotlib
 from config import GRAPH_DIR, PREDICT_MONTHS
 
-# グラフ出力ディレクトリの自動生成（存在しない場合のエラーを事前に防止）
-GRAPH_DIR.mkdir(parents=True, exist_ok=True)
-
 def savefig(filename):
     """グラフ画像ファイルの出力フルパスを解決するヘルパー関数"""
     return GRAPH_DIR / filename
@@ -25,7 +22,7 @@ def create_line_graph(df, x_col, title, filename):
     for col in df.columns:
         if col == x_col:
             continue
-        # マーカー（o）と程よい線の太さ（linewidth=2）を適用し、視認性を大幅に向上
+        # マーカー（o）と程よい線の太さ（linewidth=2）を適用し、視認性の向上
         plt.plot(x, df[col], marker="o", linewidth=2, label=col)
 
     plt.title(title)
@@ -77,7 +74,6 @@ def create_all_graphs(graph_data):
     create_line_graph(graph_data["monthly_graph"], "期間", "月間欠席推移", "月間欠席推移.png")
     # 6. 分析⑥ 月別（季節性）
     create_bar_graph(graph_data["month_graph"], "月", "月別欠席日数", "月別欠席日数.png")
-    print("グラフ出力完了")
 
 # ==========================================================
 # ■ 4. AI予測用：未来リスクシミュレーション曲線（予測の可視化）

@@ -21,7 +21,6 @@ class ExcelWriter:
     # ======================================================
     # ■ 1. 単一セルへのテキスト書き込み
     # ======================================================
-    # excel_writer.py の write_cell をこのように変更
     def write_cell(self, ws, cell_coord, text):
         """
         ws: Worksheetオブジェクト（report_generatorから渡されたもの）
