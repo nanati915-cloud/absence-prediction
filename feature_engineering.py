@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from config import IMPUTATION_METHOD, WINDOW_SIZE
+from config import IMPUTATION_METHOD, WINDOW_SIZE ,FEATURE_COUNT
 
 # ==========================================================
 # ■ タイムウィンドウの設定（スライディングウィンドウ法）
@@ -23,7 +23,7 @@ def create_stability_dataset(monthly_df, child_name):
     
     if first_valid_idx is None:
         # 有効なデータが1件もない場合は、安全に空の配列を返す
-        return np.empty((0, 8)), np.empty((0,))
+        return np.empty((0, FEATURE_COUNT)), np.empty((0,))
         
     # 入園前の未在籍期間をデータセットから完全に「削除」（データサイエンス的妥当性の担保）
     admitted_series = raw_series.loc[first_valid_idx:]
@@ -49,7 +49,7 @@ def create_stability_dataset(monthly_df, child_name):
 
     # トリミングした結果、入園後の在籍期間がウィンドウサイズ（6ヶ月）以下の場合はスキップ
     if len(series) <= WINDOW_SIZE:
-        return np.empty((0, 8)), np.empty((0,))
+        return np.empty((0, FEATURE_COUNT)), np.empty((0,))
 
     # ------------------------------------------------------
     # 2. 特徴量エンジニアリング（統計的アプローチ）

@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from config import PREDICT_MONTHS, STABLE_THRESHOLD, STABLE_MONTHS
+from config import PREDICT_MONTHS, STABLE_THRESHOLD, STABLE_MONTHS , WINDOW_SIZE
 
 # ==========================================================
 # ■ 1. 推論用・特徴量リアルタイム生成関数
@@ -110,7 +110,7 @@ def run_future_prediction(model, monthly_df, child_name):
     # ==========================================
     for _ in range(PREDICT_MONTHS):
 
-        window = work[-6:]
+        window = work[-WINDOW_SIZE:]
 
         X = build_features(window)
 

@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from config import TREND_THRESHOLD , SEASON_THRESHOLD
+from config import TREND_THRESHOLD , SEASON_THRESHOLD , CHILDREN
 
 class TextBuilder:
     """
@@ -170,7 +170,7 @@ class TextBuilder:
     def trend_analysis(self, graph_data, results):
         lines = []
 
-        for child in ["子供001", "子供002"]:
+        for child in CHILDREN:
             texts = [
                 self._age_trend(graph_data, child),
                 self._grade_trend(graph_data, child),
@@ -197,7 +197,7 @@ class TextBuilder:
         if not results:
             return "データが不足しているため、判定できませんでした。"
         lines = []
-        for child in ["子供001", "子供002"]:
+        for child in CHILDREN:
             result = results.get(child)
             lines.append(f"【{child}】")
             if (
@@ -239,7 +239,7 @@ class TextBuilder:
 
         lines = []
 
-        for child in ["子供001", "子供002"]:
+        for child in CHILDREN:
             result = results.get(child)
             lines.append(f"【{child}】")
             if (
@@ -296,7 +296,7 @@ class TextBuilder:
 
         return text
     
-    
+
     # シート8で使用する「最終結論」の文章を生成
     def final_conclusion(self, graph_data, results):
         if not results:
