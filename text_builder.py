@@ -7,6 +7,9 @@ class TextBuilder:
     【概要】統計データの欠損を自動検知し、適切な文章のみを生成するレポート生成エンジン。
     """
 
+    # ==========================================================
+    # ■ 共通処理（各分析で利用する補助関数）
+    # ==========================================================
     def _is_valid(self, df):
         """
         データが分析可能か判定する。
@@ -23,12 +26,7 @@ class TextBuilder:
             return False
         return True
 
-    def _calculate_avg(self, df, child):
-        values = pd.to_numeric(df[child], errors="coerce").dropna()
-        if values.empty:
-            return None
-        return float(values.mean())
-    
+    # 分析①②③④⑥で共通利用する傾向文章生成処理
     def _trend_text(self, df, child, before_label, after_label, target_name):
         """
         前半・後半の平均欠席日数を比較し、傾向文章を生成する共通処理。
@@ -79,10 +77,16 @@ class TextBuilder:
             f"{after_label}では約{back_avg:.1f}日であり、"
             f"{target_name}による大きな変化は認められなかった。"
         )
+    
 
 
+    # ==========================================================
+    # ■ 1. 分析文章（過去データ）の生成
+    # ==========================================================
 
+    # 分析① 月齢別欠席日数の説明文を生成
     def _age_trend(self, graph_data, child):
+        
         df = graph_data.get("age_graph")
         return self._trend_text(
             df=df,
@@ -92,6 +96,8 @@ class TextBuilder:
             target_name="月齢"
         )
     
+
+    # 分析② 学年別欠席日数の説明文を生成
     def _grade_trend(self, graph_data, child):
         df = graph_data.get("grade_graph")
         return self._trend_text(
@@ -101,7 +107,9 @@ class TextBuilder:
             after_label="高学年",
             target_name="学年"
         )
+    
 
+    # 分析③ 登園月数別欠席日数の説明文を生成
     def _attendance_trend(self, graph_data, child):
         df = graph_data.get("attendance_graph")
         return self._trend_text(
@@ -111,7 +119,9 @@ class TextBuilder:
             after_label="後半",
             target_name="登園月数"
         )
-        
+
+
+    # 分析④ 登園年数別欠席日数の説明文を生成 
     def _year_trend(self, graph_data, child):
         df = graph_data.get("years_graph")
         return self._trend_text(
@@ -121,7 +131,9 @@ class TextBuilder:
             after_label="後半",
             target_name="登園年数"
         )
+    
 
+    # 分析⑤ 月別（季節性）の説明文を生成
     def _season_trend(self, graph_data, child):
         df = graph_data.get("month_graph")
         if not self._is_valid(df):
@@ -140,7 +152,9 @@ class TextBuilder:
             return f"{peak_month}の欠席日数が{peak_value}日と最も高く、季節性の影響がみられた。"
 
         return "年間を通して大きな季節性は認められなかった。"
+    
 
+    # 分析⑥ 月間推移の説明文を生成
     def _monthly_trend(self, graph_data, child):
         df = graph_data.get("monthly_graph")
         return self._trend_text(
@@ -151,6 +165,8 @@ class TextBuilder:
             target_name="月間推移"
         )
     
+
+    # シート2・シート7で使用する「分析傾向」の文章を生成    
     def trend_analysis(self, graph_data, results):
         lines = []
 
@@ -174,7 +190,9 @@ class TextBuilder:
 
 
         return "\n".join(lines).rstrip()
+    
 
+    # シート2で使用する「未来予測結果」の文章を生成
     def future_prediction_summary(self, graph_data, results):
         if not results:
             return "データが不足しているため、判定できませんでした。"
@@ -212,7 +230,9 @@ class TextBuilder:
             lines.append(text)
 
         return "\n".join(lines).rstrip()
+    
 
+    # シート2・シート7で使用する「業務改善提案」の文章を生成
     def business_improvement(self, graph_data, results):
         if not results:
             return "データが不足しているため、判定できませんでした。"
@@ -220,11 +240,8 @@ class TextBuilder:
         lines = []
 
         for child in ["子供001", "子供002"]:
-
             result = results.get(child)
-
             lines.append(f"【{child}】")
-
             if (
                 result is None
                 or len(result.get("future_series", [])) < 2
@@ -246,7 +263,9 @@ class TextBuilder:
 
 
         return "\n".join(lines).rstrip()
+    
 
+    # シート8で使用する「総合所見」の文章を生成
     def overall_summary(self, graph_data, results):
         if not results:
             return "データが不足しているため、判定できませんでした。"
@@ -276,7 +295,9 @@ class TextBuilder:
             )
 
         return text
-
+    
+    
+    # シート8で使用する「最終結論」の文章を生成
     def final_conclusion(self, graph_data, results):
         if not results:
             return "データが不足しているため、判定できませんでした。"
