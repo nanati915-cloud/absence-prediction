@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from config import TREND_THRESHOLD , SEASON_THRESHOLD
 
 class TextBuilder:
     """
@@ -27,85 +28,99 @@ class TextBuilder:
         if values.empty:
             return None
         return float(values.mean())
+    
+    def _trend_text(self, df, child, before_label, after_label, target_name):
+        """
+        前半・後半の平均欠席日数を比較し、傾向文章を生成する共通処理。
+
+        Parameters
+        ----------
+        df : DataFrame
+            分析対象データ
+        child : str
+            子供名
+        before_label : str
+            前半の説明文（例："月齢が低い時期"）
+        after_label : str
+            後半の説明文（例："後半"）
+        target_name : str
+            分析対象名（例："月齢"、"学年"）
+        """
+        if not self._is_valid(df):
+            return None
+
+        values = pd.to_numeric(df[child], errors="coerce").dropna()
+        if len(values) < 2:
+            return None
+
+        # 前半・後半に分割して平均値を算出
+        mid = len(values) // 2
+        front_avg = values.iloc[:mid].mean()
+        back_avg = values.iloc[mid:].mean()
+
+        diff = front_avg - back_avg
+
+        if diff > TREND_THRESHOLD:
+            return (
+                f"{before_label}の平均欠席日数は約{front_avg:.1f}日であったが、"
+                f"{after_label}では約{back_avg:.1f}日となり、"
+                "全体として減少傾向がみられた。"
+            )
+
+        elif diff < -TREND_THRESHOLD:
+            return (
+                f"{before_label}の平均欠席日数は約{front_avg:.1f}日であったが、"
+                f"{after_label}では約{back_avg:.1f}日となり、"
+                "全体として増加傾向がみられた。"
+            )
+
+        return (
+            f"{before_label}の平均欠席日数は約{front_avg:.1f}日、"
+            f"{after_label}では約{back_avg:.1f}日であり、"
+            f"{target_name}による大きな変化は認められなかった。"
+        )
+
+
 
     def _age_trend(self, graph_data, child):
         df = graph_data.get("age_graph")
-        if not self._is_valid(df):
-            return None
-
-        values = pd.to_numeric(df[child], errors="coerce").dropna()
-        if len(values) < 2:
-            return None
-
-        first = int(values.iloc[0])
-        last = int(values.iloc[-1])
-        diff = first - last
-
-        if diff > 0.5:
-            return f"月齢が上がるにつれて欠席日数は{first}日から{last}日へ減少した。"
-        elif diff < -0.5:
-            return f"月齢が上がるにつれて欠席日数は{first}日から{last}日へ増加した。"
-
-        return "月齢による欠席日数の大きな変化は認められなかった。"
+        return self._trend_text(
+            df=df,
+            child=child,
+            before_label="月齢が低い時期",
+            after_label="後半",
+            target_name="月齢"
+        )
+    
     def _grade_trend(self, graph_data, child):
         df = graph_data.get("grade_graph")
-        if not self._is_valid(df):
-            return None
-
-        values = pd.to_numeric(df[child], errors="coerce").dropna()
-        if len(values) < 2:
-            return None
-
-        first = int(values.iloc[0])
-        last = int(values.iloc[-1])
-        diff = first - last
-
-        if diff > 0.5:
-            return f"学年が上がるにつれて欠席日数は{first}日から{last}日へ減少した。"
-        elif diff < -0.5:
-            return f"学年が上がるにつれて欠席日数は{first}日から{last}日へ増加した。"
-
-        return "学年による欠席日数の大きな変化は認められなかった。"
+        return self._trend_text(
+            df=df,
+            child=child,
+            before_label="低学年",
+            after_label="高学年",
+            target_name="学年"
+        )
 
     def _attendance_trend(self, graph_data, child):
         df = graph_data.get("attendance_graph")
-        if not self._is_valid(df):
-            return None
-
-        values = pd.to_numeric(df[child], errors="coerce").dropna()
-        if len(values) < 2:
-            return None
-
-        first = int(values.iloc[0])
-        last = int(values.iloc[-1])
-        diff = first - last
-
-        if diff > 0.5:
-            return f"登園月数の経過に伴い欠席日数は{first}日から{last}日へ減少した。"
-        elif diff < -0.5:
-            return f"登園月数の経過に伴い欠席日数は{first}日から{last}日へ増加した。"
-
-        return "登園月数による欠席日数の大きな変化は認められなかった。"
-    
+        return self._trend_text(
+            df=df,
+            child=child,
+            before_label="登園初期",
+            after_label="後半",
+            target_name="登園月数"
+        )
+        
     def _year_trend(self, graph_data, child):
         df = graph_data.get("years_graph")
-        if not self._is_valid(df):
-            return None
-
-        values = pd.to_numeric(df[child], errors="coerce").dropna()
-        if len(values) < 2:
-            return None
-
-        first = int(values.iloc[0])
-        last = int(values.iloc[-1])
-        diff = first - last
-
-        if diff > 0.5:
-            return f"登園年数の経過に伴い欠席日数は{first}日から{last}日へ減少した。"
-        elif diff < -0.5:
-            return f"登園年数の経過に伴い欠席日数は{first}日から{last}日へ増加した。"
-
-        return "登園年数による欠席日数の大きな変化は認められなかった。"
+        return self._trend_text(
+            df=df,
+            child=child,
+            before_label="登園年数の前半",
+            after_label="後半",
+            target_name="登園年数"
+        )
 
     def _season_trend(self, graph_data, child):
         df = graph_data.get("month_graph")
@@ -121,30 +136,20 @@ class TextBuilder:
         peak_value = int(values.max())
         average = int(values.mean())
 
-        if peak_value - average >= 0.5:
+        if peak_value - average >= SEASON_THRESHOLD:
             return f"{peak_month}の欠席日数が{peak_value}日と最も高く、季節性の影響がみられた。"
 
         return "年間を通して大きな季節性は認められなかった。"
 
     def _monthly_trend(self, graph_data, child):
         df = graph_data.get("monthly_graph")
-        if not self._is_valid(df):
-            return None
-
-        values = pd.to_numeric(df[child], errors="coerce").dropna()
-        if len(values) < 2:
-            return None
-
-        first = int(values.iloc[0])
-        last = int(values.iloc[-1])
-        diff = first - last
-
-        if diff > 0.5:
-            return f"月間推移では欠席日数が{first}日から{last}日へ減少した。"
-        elif diff < -0.5:
-            return f"月間推移では欠席日数が{first}日から{last}日へ増加した。"
-
-        return "月間推移に大きな変化は認められなかった。"
+        return self._trend_text(
+            df=df,
+            child=child,
+            before_label="期間前半",
+            after_label="後半",
+            target_name="月間推移"
+        )
     
     def trend_analysis(self, graph_data, results):
         lines = []
@@ -167,28 +172,21 @@ class TextBuilder:
             else:
                 lines.append("データが不足しているため、判定できませんでした。")
 
-            lines.append("")
 
         return "\n".join(lines).rstrip()
 
     def future_prediction_summary(self, graph_data, results):
         if not results:
             return "データが不足しているため、判定できませんでした。"
-
         lines = []
-
         for child in ["子供001", "子供002"]:
-
             result = results.get(child)
-
             lines.append(f"【{child}】")
-
             if (
                 result is None
                 or len(result.get("future_series", [])) < 2
             ):
                 lines.append("データが不足しているため、判定できませんでした。")
-                lines.append("")
                 continue
 
             avg = result.get("predicted_absence", 0)
@@ -197,20 +195,21 @@ class TextBuilder:
             stable = result.get("stable_month")
 
             if abs(upper - lower) >= 0.1:
-                lines.append(
-                    f"平均欠席日数は約{avg:.1f}日（予測範囲：約{lower:.1f}～{upper:.1f}日）と予測された。"
+                text = (
+                    f"平均欠席日数は約{avg:.1f}日"
+                    f"（予測範囲：約{lower:.1f}～{upper:.1f}日）と予測された。"
                 )
             else:
-                lines.append(
+                text = (
                     f"平均欠席日数は約{avg:.1f}日と予測された。"
                 )
 
             if stable is not None:
-                lines.append(f"約{stable}か月後に安定基準へ到達すると予測された。")
+                text += f"約{stable}か月後に安定基準へ到達すると予測された。"
             else:
-                lines.append("予測期間内に安定基準へ到達しないと予測された。")
+                text += "予測期間内に安定基準へ到達しないと予測された。"
 
-            lines.append("")
+            lines.append(text)
 
         return "\n".join(lines).rstrip()
 
@@ -231,7 +230,6 @@ class TextBuilder:
                 or len(result.get("future_series", [])) < 2
             ):
                 lines.append("データが不足しているため、判定できませんでした。")
-                lines.append("")
                 continue
 
             avg = result.get("predicted_absence", 0)
@@ -239,16 +237,13 @@ class TextBuilder:
 
             if stable is not None:
                 lines.append(
-                    f"平均欠席日数は約{avg:.1f}日と予測された。"
-                    f"約{stable}か月後に安定が見込まれるため、それまでは健康観察と、家庭と保育園・学校との情報共有を継続することが望ましい。"
+                    f"平均欠席日数は約{avg:.1f}日と予測された。約{stable}か月後に安定が見込まれるため、それまでは健康観察と、家庭と保育園・学校との情報共有を継続することが望ましい。"
                 )
             else:
                 lines.append(
-                    f"平均欠席日数は約{avg:.1f}日と予測された。"
-                    "予測期間内で安定化は見込まれないため、健康観察や個別支援を継続することが望ましい。"
+                    f"平均欠席日数は約{avg:.1f}日と予測された。予測期間内で安定化は見込まれないため、健康観察や個別支援を継続することが望ましい。"
                 )
 
-            lines.append("")
 
         return "\n".join(lines).rstrip()
 
