@@ -6,6 +6,25 @@ from config import IMPUTATION_METHOD, WINDOW_SIZE ,FEATURE_COUNT
 # ■ タイムウィンドウの設定（スライディングウィンドウ法）
 # ==========================================================
 
+def remove_long_missing_period(series, threshold=3):
+    """
+    3か月以上連続する欠損期間を除外する。
+    入園前・一時退園などの対象外期間を削除する。
+    """
+
+    is_nan = series.isna()
+
+    # NaN / 非NaNの切り替わりごとにグループ化
+    groups = (is_nan != is_nan.shift()).cumsum()
+
+    remove_idx = []
+
+    for _, group in series.groupby(groups):
+        if group.isna().all() and len(group) >= threshold:
+            remove_idx.extend(group.index)
+
+    return series.drop(remove_idx)
+
 
 def create_stability_dataset(monthly_df, child_name):
     """
@@ -15,30 +34,36 @@ def create_stability_dataset(monthly_df, child_name):
     # 対象児童の時系列データを取得
     raw_series = monthly_df[child_name].copy()
 
-    # ------------------------------------------------------
-    # 1. 段階的欠損値処理 (入園前と入園後の場合分け)
-    # ------------------------------------------------------
-    # 【処理A】入園月（最初の有効なデータが記録された位置）を特定
     first_valid_idx = raw_series.first_valid_index()
-    
+
     if first_valid_idx is None:
-        # 有効なデータが1件もない場合は、安全に空の配列を返す
         return np.empty((0, FEATURE_COUNT)), np.empty((0,))
-        
-    # 入園前の未在籍期間をデータセットから完全に「削除」（データサイエンス的妥当性の担保）
+
+
+    # 入園前を除外
     admitted_series = raw_series.loc[first_valid_idx:]
 
-    # 【処理B】入園「後」の記録漏れ（途中に残ったNaN）の補完（インピュテーション）
+
+    # 3か月以上連続空欄を除外
+    admitted_series = remove_long_missing_period(
+        admitted_series,
+        threshold=3
+    )
+
+
+    # 残った短期間欠測だけ補完
     if admitted_series.isna().sum() > 0:
+
         if IMPUTATION_METHOD == "median":
-            # その児童自身の過去の中央値で補完（外れ値に強く、欠席ベースラインを壊さない）
+
             fill_value = admitted_series.median()
-            # 過去データが少なすぎて中央値がNaNの場合は0でセーフティガード
+
             if np.isnan(fill_value):
                 fill_value = 0.0
+
             admitted_series = admitted_series.fillna(fill_value)
+
         else:
-            # Policyがzero、またはその他の場合は安全のため0日欠席として処理
             admitted_series = admitted_series.fillna(0.0)
 
     # 統計計算用に型を確定させ、インデックスを初期化
