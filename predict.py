@@ -7,7 +7,7 @@ from config import PREDICT_MONTHS, STABLE_THRESHOLD, STABLE_MONTHS , WINDOW_SIZE
 # ==========================================================
 def build_features(window):
     """
-    【概要】直近6ヶ月の窓データから、推論（予測）に必要な統計特徴量をリアルタイムに計算します。
+    【概要】過去6ヶ月の窓データから、推論（予測）に必要な統計特徴量をリアルタイムに計算します。
     """
     window = np.array(window, dtype=float)
 
