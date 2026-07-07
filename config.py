@@ -28,11 +28,21 @@ REPORT_DIR.mkdir(parents=True, exist_ok=True)
 # =========================================================
 # ■ 3. 機械学習（LightGBM）のハイパーパラメータ設定
 # =========================================================
+
 RANDOM_STATE = 42
+
+# LightGBM
 N_ESTIMATORS = 300
 LEARNING_RATE = 0.05
-MAX_DEPTH = 6
+MAX_DEPTH = 5
 NUM_LEAVES = 31
+MIN_CHILD_SAMPLES = 5
+SUBSAMPLE = 0.8
+COLSAMPLE_BYTREE = 0.8
+
+# 予測区間（分位点回帰）の設定
+LOWER_ALPHA = 0.05 #予測区間の下限（5%）を定義
+UPPER_ALPHA = 0.95 #予測区間の上限（95%）を定義
 
 # =========================================================
 # ■ 4. 未来リスク予測および「健康安定化」の判定基準

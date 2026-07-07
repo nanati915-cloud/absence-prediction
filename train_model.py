@@ -1,5 +1,5 @@
 from lightgbm import LGBMRegressor
-from config import RANDOM_STATE
+from config import RANDOM_STATE, N_ESTIMATORS, LEARNING_RATE, MAX_DEPTH, NUM_LEAVES, MIN_CHILD_SAMPLES, SUBSAMPLE, COLSAMPLE_BYTREE, LOWER_ALPHA, UPPER_ALPHA
 
 
 def _create_model(objective="regression", alpha=None):
@@ -8,15 +8,25 @@ def _create_model(objective="regression", alpha=None):
     """
 
     params = {
+        # 学習方法を指定（regression：数値予測、binary：2値分類）
         "objective": objective,
-        "n_estimators": 300,
-        "learning_rate": 0.05,
-        "max_depth": 5,
-        "num_leaves": 31,
-        "min_child_samples": 5,
-        "subsample": 0.8,
-        "colsample_bytree": 0.8,
+        # 決定木を何本作るか（増やすと精度↑・学習時間↑）
+        "n_estimators": N_ESTIMATORS,
+        # 1回の学習でどれだけ修正するか（小さいほどゆっくり・安定して学習）
+        "learning_rate": LEARNING_RATE,
+        # 決定木の深さ（深いほど複雑なルールを学習するが過学習しやすい）
+        "max_depth": MAX_DEPTH,
+        # 木の葉（終端ノード）の最大数（増やすと複雑な予測が可能）
+        "num_leaves": NUM_LEAVES,
+        # 1つの葉に必要な最小データ数（小さいほど細かく学習する）
+        "min_child_samples": MIN_CHILD_SAMPLES,
+        # 学習時に使用するデータの割合（1.0なら全データ、0.8なら80%　小さくすると過学習を抑えやすい）
+        "subsample": SUBSAMPLE,
+        # 学習時に使用する特徴量の割合（1.0なら全特徴量、0.8なら80%　小さくすると過学習を抑えやすい）
+        "colsample_bytree": COLSAMPLE_BYTREE,
+        # 乱数を固定（毎回同じ学習結果を再現できる）
         "random_state": RANDOM_STATE,
+        # 学習ログを非表示（0以上にすると学習状況を表示）
         "verbose": -1,
     }
 
@@ -35,8 +45,8 @@ def train_model(X, y):
     dict
         {
             "median": 中央値予測モデル,
-            "lower": 下限予測モデル(5%),
-            "upper": 上限予測モデル(95%)
+            "lower": 下限予測モデル(config.pyで制御),
+            "upper": 上限予測モデル(config.pyで制御)
         }
     """
 
@@ -47,17 +57,17 @@ def train_model(X, y):
     median_model = _create_model()
     median_model.fit(X, y)
 
-    # 下限5%
+    # 下限
     lower_model = _create_model(
         objective="quantile",
-        alpha=0.05
+        alpha=LOWER_ALPHA
     )
     lower_model.fit(X, y)
 
-    # 上限95%
+    # 上限
     upper_model = _create_model(
         objective="quantile",
-        alpha=0.95
+        alpha=UPPER_ALPHA
     )
     upper_model.fit(X, y)
 
