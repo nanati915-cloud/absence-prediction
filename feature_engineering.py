@@ -28,8 +28,8 @@ def remove_long_missing_period(series, threshold=3):
 
 def create_stability_dataset(monthly_df, child_name):
     """
-    【概要】生系列データから、入園前期間を除外し、入園後の欠損値を適切に補完した上で特徴量を生成します。
-    入園前のデータを一律0埋めせず削除することで、免疫獲得トレンドの歪みを防止します。
+    生系列データから、対象外期間（入園前・長期欠損期間）を除外し、
+    短期間の欠損値を補完した上で特徴量を生成します。
     """
     # 対象児童の時系列データを取得
     raw_series = monthly_df[child_name].copy()
