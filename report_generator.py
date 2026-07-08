@@ -27,7 +27,7 @@ class ReportGenerator:
         self.text = text_builder
         
         self.cell_map = cell_map
-    def run(self, results, graph_data, monthly_df):
+    def run(self, results, graph_data):
         print("レポート生成開始")
         today = datetime.now().strftime("%Y/%m/%d")
 
@@ -45,15 +45,15 @@ class ReportGenerator:
         sheet_name, cell_coord = CELL_MAP["summary_trend"]
         # シート名からワークブック内のシートオブジェクトを取得
         sheet = self.workbook[sheet_name]
-        self.writer.write_cell(sheet, cell_coord, self.text.trend_analysis(graph_data, results))
+        self.writer.write_cell(sheet, cell_coord, self.text.trend_analysis(graph_data))
 
         sheet_name, cell_coord = CELL_MAP["summary_future"]
         sheet = self.workbook[sheet_name]
-        self.writer.write_cell(sheet, cell_coord, self.text.future_prediction_summary(graph_data, results))
+        self.writer.write_cell(sheet, cell_coord, self.text.future_prediction_summary(results))
 
         sheet_name, cell_coord = CELL_MAP["summary_business"]
         sheet = self.workbook[sheet_name]
-        self.writer.write_cell(sheet, cell_coord, self.text.business_improvement(graph_data, results))
+        self.writer.write_cell(sheet, cell_coord, self.text.business_improvement(results))
 
         # ==================================================
         # ■ 3. 「3」〜「5」シート：過去統計分析グラフの自動挿入
@@ -88,12 +88,12 @@ class ReportGenerator:
         # 傾向考察の処理
         sheet_name, cell_coord = CELL_MAP["trend_analysis"]
         sheet = self.workbook[sheet_name]
-        self.writer.write_cell(sheet, cell_coord, self.text.trend_analysis(graph_data, results))
+        self.writer.write_cell(sheet, cell_coord, self.text.trend_analysis(graph_data))
 
         # 業務改善提案の処理
         sheet_name, cell_coord = CELL_MAP["business_improvement"]
         sheet = self.workbook[sheet_name]
-        self.writer.write_cell(sheet, cell_coord, self.text.business_improvement(graph_data, results))
+        self.writer.write_cell(sheet, cell_coord, self.text.business_improvement(results))
         
         # ==================================================
         # ■ 5. 「7」シート：分析⑦ 未来リスク（AIシミュレーション結果）
@@ -115,12 +115,12 @@ class ReportGenerator:
         # 総合所見の処理
         sheet_name, cell_coord = CELL_MAP["total_summary"]
         sheet = self.workbook[sheet_name]
-        self.writer.write_cell(sheet, cell_coord, self.text.overall_summary(graph_data, results))
+        self.writer.write_cell(sheet, cell_coord, self.text.overall_summary(results))
 
         # 最終結論の処理
         sheet_name, cell_coord = CELL_MAP["total_conclusion"]
         sheet = self.workbook[sheet_name]
-        self.writer.write_cell(sheet, cell_coord, self.text.final_conclusion(graph_data, results))
+        self.writer.write_cell(sheet, cell_coord, self.text.final_conclusion(results))
 
         # ==================================================
         # ■ 7. ファイルの永続化とクローズ

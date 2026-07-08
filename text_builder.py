@@ -167,7 +167,7 @@ class TextBuilder:
     
 
     # シート2・シート7で使用する「分析傾向」の文章を生成    
-    def trend_analysis(self, graph_data, results):
+    def trend_analysis(self, graph_data):
         lines = []
 
         for child in CHILDREN:
@@ -193,7 +193,7 @@ class TextBuilder:
     
 
     # シート2で使用する「未来予測結果」の文章を生成
-    def future_prediction_summary(self, graph_data, results):
+    def future_prediction_summary(self, results):
         if not results:
             return "データが不足しているため、判定できませんでした。"
         lines = []
@@ -233,7 +233,7 @@ class TextBuilder:
     
 
     # シート2・シート7で使用する「業務改善提案」の文章を生成
-    def business_improvement(self, graph_data, results):
+    def business_improvement(self, results):
         if not results:
             return "データが不足しているため、判定できませんでした。"
 
@@ -266,7 +266,7 @@ class TextBuilder:
     
 
     # シート8で使用する「総合所見」の文章を生成
-    def overall_summary(self, graph_data, results):
+    def overall_summary(self, results):
         if not results:
             return "データが不足しているため、判定できませんでした。"
 
@@ -298,7 +298,7 @@ class TextBuilder:
     
 
     # シート8で使用する「最終結論」の文章を生成
-    def final_conclusion(self, graph_data, results):
+    def final_conclusion(self, results):
         if not results:
             return "データが不足しているため、判定できませんでした。"
 

@@ -97,7 +97,7 @@ def main():
     
     # ③ 部品をすべて渡して初期化し、実行
     report = ReportGenerator(writer, CELL_MAP, TextBuilder())
-    report.run(results, graph_data, monthly_df)
+    report.run(results, graph_data)
     
     print(f"レポート出力完了: {output_path}")
 
