@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from config import TREND_THRESHOLD , SEASON_THRESHOLD , CHILDREN
 
 class TextBuilder:
