@@ -54,6 +54,8 @@ STABLE_THRESHOLD = 2
 STABLE_MONTHS = 6
 WINDOW_SIZE = 6
 
+# 連続未入力がこの数値以上続いた場合、除外する
+MISSING_PERIOD_THRESHOLD = 3
 # 傾向分析において「増加・減少」と判定する平均差（日）
 TREND_THRESHOLD = 0.5
 # 季節性の影響があると判定する閾値（日）

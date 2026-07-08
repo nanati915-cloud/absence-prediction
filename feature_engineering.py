@@ -1,14 +1,14 @@
 import numpy as np
 import pandas as pd
-from config import IMPUTATION_METHOD, WINDOW_SIZE ,FEATURE_COUNT
+from config import IMPUTATION_METHOD, WINDOW_SIZE ,FEATURE_COUNT , MISSING_PERIOD_THRESHOLD
 
 # ==========================================================
 # ■ タイムウィンドウの設定（スライディングウィンドウ法）
 # ==========================================================
 
-def remove_long_missing_period(series, threshold=3):
+def remove_long_missing_period(series, threshold=MISSING_PERIOD_THRESHOLD):
     """
-    3か月以上連続する欠損期間を除外する。
+    指定された期間以上連続する欠損期間を除外する。
     入園前・一時退園などの対象外期間を削除する。
     """
 
@@ -47,7 +47,7 @@ def create_stability_dataset(monthly_df, child_name):
     # 3か月以上連続空欄を除外
     admitted_series = remove_long_missing_period(
         admitted_series,
-        threshold=3
+        threshold=MISSING_PERIOD_THRESHOLD
     )
 
 
