@@ -96,14 +96,14 @@ def create_stability_dataset(monthly_df, child_name):
         decreasing = np.sum(np.diff(window) < 0)
 
         features = [
-            mean,
-            std,
-            maximum,
-            minimum,
-            trend,
-            diff_last,
-            increasing,
-            decreasing,
+            mean,       # 平均欠席日数
+            std,        # 標準偏差
+            maximum,    # 最大欠席日数
+            minimum,    # 最小欠席日数
+            trend,      # 増減傾向
+            diff_last,  # 最新月と平均との差
+            increasing, # 増加回数
+            decreasing, # 減少回数
         ]
         X.append(features)
 

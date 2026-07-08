@@ -49,16 +49,12 @@ def detect_stable_month(series,
     count = 0
 
     for i, value in enumerate(series):
-
         if value <= threshold:
             count += 1
-
             if count >= continue_month:
                 return i - continue_month + 2
-
         else:
             count = 0
-
     return None
 
 

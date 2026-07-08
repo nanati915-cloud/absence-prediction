@@ -8,7 +8,7 @@ def _create_model(objective="regression", alpha=None):
     """
 
     params = {
-        # 学習方法を指定（regression：数値予測、binary：2値分類）
+        # 学習目的（regression：通常回帰、quantile：分位点回帰）
         "objective": objective,
         # 決定木を何本作るか（増やすと精度↑・学習時間↑）
         "n_estimators": N_ESTIMATORS,
@@ -20,9 +20,9 @@ def _create_model(objective="regression", alpha=None):
         "num_leaves": NUM_LEAVES,
         # 1つの葉に必要な最小データ数（小さいほど細かく学習する）
         "min_child_samples": MIN_CHILD_SAMPLES,
-        # 学習時に使用するデータの割合（1.0なら全データ、0.8なら80%　小さくすると過学習を抑えやすい）
+        # 各決定木の学習に使うデータの割合（1.0なら全データ、0.8なら80%　小さくすると過学習を抑えやすい）
         "subsample": SUBSAMPLE,
-        # 学習時に使用する特徴量の割合（1.0なら全特徴量、0.8なら80%　小さくすると過学習を抑えやすい）
+        # 各決定木の学習に使う特徴量の割合（1.0なら全特徴量、0.8なら80%　小さくすると過学習を抑えやすい）
         "colsample_bytree": COLSAMPLE_BYTREE,
         # 乱数を固定（毎回同じ学習結果を再現できる）
         "random_state": RANDOM_STATE,
@@ -30,6 +30,7 @@ def _create_model(objective="regression", alpha=None):
         "verbose": -1,
     }
 
+    # 分位点回帰の場合のみ予測する分位点を設定
     if objective == "quantile":
         params["alpha"] = alpha
 

@@ -33,14 +33,14 @@ REPORT_DIR.mkdir(parents=True, exist_ok=True)
 FEATURE_COUNT = 8
 
 # LightGBM
-RANDOM_STATE = 42
-N_ESTIMATORS = 300
-LEARNING_RATE = 0.05
-MAX_DEPTH = 5
-NUM_LEAVES = 31
-MIN_CHILD_SAMPLES = 5
-SUBSAMPLE = 0.8
-COLSAMPLE_BYTREE = 0.8
+RANDOM_STATE = 42       # 乱数シード
+N_ESTIMATORS = 300      # 決定木数
+LEARNING_RATE = 0.05    # 学習率
+MAX_DEPTH = 5           # 決定木の最大深さ
+NUM_LEAVES = 31         # 葉ノード数
+MIN_CHILD_SAMPLES = 5   # 最小データ数
+SUBSAMPLE = 0.8         # 行抽出率・データ抽出率
+COLSAMPLE_BYTREE = 0.8  # 列抽出率・特徴量抽出率
 
 # 予測区間（分位点回帰）の設定
 LOWER_ALPHA = 0.05 #予測区間の下限（5%）を定義
@@ -49,12 +49,15 @@ UPPER_ALPHA = 0.95 #予測区間の上限（95%）を定義
 # =========================================================
 # ■ 4. 未来リスク予測および「健康安定化」の判定基準
 # =========================================================
+# 未来予測する期間（月）
 PREDICT_MONTHS = 24
+# 「安定」と判定する欠席日数（日）
 STABLE_THRESHOLD = 2
+# 安定期間とみなす連続月数（月）
 STABLE_MONTHS = 6
+# 特徴量作成・予測に使用する過去データの期間（月）
 WINDOW_SIZE = 6
-
-# 連続未入力がこの数値以上続いた場合、除外する
+# 除外する欠損期間の閾値（月）
 MISSING_PERIOD_THRESHOLD = 3
 # 傾向分析において「増加・減少」と判定する平均差（日）
 TREND_THRESHOLD = 0.5

@@ -43,7 +43,7 @@ def build_graph_data(df):
 # =========================================================
 # ■ 各分析軸のデータ抽出ロジック
 # =========================================================
-#月齢
+#月齢 (B～D列)
 def extract_age_graph(df):
     sub = df.iloc[2:75, 1:4].copy()
     sub.columns = ["月齢"] + CHILDREN
@@ -51,7 +51,7 @@ def extract_age_graph(df):
         sub[child] = pd.to_numeric(sub[child], errors="coerce")
     return sub
 
-#登園月数
+#登園月数 (F～H列)
 def extract_attendance_graph(df):
     sub = df.iloc[2:63, 5:8].copy()
     sub.columns = ["登園月数"] + CHILDREN
@@ -59,7 +59,7 @@ def extract_attendance_graph(df):
         sub[child] = pd.to_numeric(sub[child], errors="coerce")
     return sub
 
-#月間
+#月間 (J～L列)
 def extract_month_graph(df):
     sub = df.iloc[2:63, 9:12].copy()
     sub.columns = ["期間"] + CHILDREN
@@ -67,7 +67,7 @@ def extract_month_graph(df):
         sub[child] = pd.to_numeric(sub[child], errors="coerce")
     return sub
 
-#月
+#月 (N～P列)
 def extract_month_summary(df):
     sub = df.iloc[2:14, 13:16].copy()
     sub.columns = ["月"] + CHILDREN
@@ -75,7 +75,7 @@ def extract_month_summary(df):
         sub[child] = pd.to_numeric(sub[child], errors="coerce")
     return sub
 
-#学年
+#学年 (R～T列)
 def extract_grade_graph(df):
     sub = df.iloc[2:9, 17:20].copy()
     sub.columns = ["クラス"] + CHILDREN
@@ -83,7 +83,7 @@ def extract_grade_graph(df):
         sub[child] = pd.to_numeric(sub[child], errors="coerce")
     return sub
 
-#登園年数
+#登園年数 (V～X列)
 def extract_years_graph(df):
     sub = df.iloc[2:8, 21:24].copy()
     sub.columns = ["登園年数"] + CHILDREN
