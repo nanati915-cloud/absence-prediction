@@ -1,3 +1,8 @@
+"""
+Excelデータの読み込み・前処理を行う。
+分析用グラフデータおよび学習用データを生成する。
+"""
+
 import pandas as pd
 from config import EXCEL_FILE, SHEET_NAME ,CHILDREN
 

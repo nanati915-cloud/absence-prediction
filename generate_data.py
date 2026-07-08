@@ -1,3 +1,7 @@
+"""
+テスト実行のためのサンプルデータの生成を行う。
+"""
+
 import numpy as np
 import random
 from openpyxl import Workbook

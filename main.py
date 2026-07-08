@@ -1,3 +1,8 @@
+"""
+システム全体を実行するメインプログラム。
+データ分析・学習・予測・報告書作成までの処理を統括する。
+"""
+
 from data_processing import preprocess
 from feature_engineering import create_stability_dataset
 from train_model import train_model

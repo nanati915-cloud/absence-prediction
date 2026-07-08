@@ -1,3 +1,8 @@
+"""
+学習済みモデルを用いて将来の欠席日数を予測する。
+安定時期の判定や予測区間の算出を行う。
+"""
+
 import numpy as np
 import pandas as pd
 from config import PREDICT_MONTHS, STABLE_THRESHOLD, STABLE_MONTHS , WINDOW_SIZE

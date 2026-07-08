@@ -1,3 +1,8 @@
+"""
+分析結果をグラフとして可視化する。
+Excel報告書へ貼り付ける画像を生成する。
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import japanize_matplotlib

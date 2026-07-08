@@ -1,3 +1,8 @@
+"""
+Excelテンプレートへ分析結果を出力する。
+グラフ・文章・予測結果を配置し、報告書を作成する。
+"""
+
 from datetime import datetime
 from config import REPORT_DIR, REPORT_FILENAME_FORMAT
 from cell_map import CELL_MAP

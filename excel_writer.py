@@ -1,3 +1,8 @@
+"""
+Excelファイルへの書き込み処理を行う。
+セル・画像・文章を指定位置へ出力する。
+"""
+
 from openpyxl import load_workbook
 from openpyxl.drawing.image import Image
 

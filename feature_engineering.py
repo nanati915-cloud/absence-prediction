@@ -1,3 +1,8 @@
+"""
+機械学習モデルへ入力する特徴量を作成する。
+過去データから統計量や傾向を算出し、学習データを生成する。
+"""
+
 import numpy as np
 import pandas as pd
 from config import IMPUTATION_METHOD, WINDOW_SIZE ,FEATURE_COUNT , MISSING_PERIOD_THRESHOLD

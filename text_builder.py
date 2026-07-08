@@ -1,3 +1,8 @@
+"""
+分析結果や予測結果からレポート用文章を生成する。
+欠損データを判定し、分析内容に応じた説明文を作成する。
+"""
+
 import pandas as pd
 from config import TREND_THRESHOLD , SEASON_THRESHOLD , CHILDREN
 

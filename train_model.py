@@ -1,3 +1,8 @@
+"""
+LightGBMを用いた機械学習モデルを学習する。
+中央値予測および予測区間モデルを生成する。
+"""
+
 from lightgbm import LGBMRegressor
 from config import RANDOM_STATE, N_ESTIMATORS, LEARNING_RATE, MAX_DEPTH, NUM_LEAVES, MIN_CHILD_SAMPLES, SUBSAMPLE, COLSAMPLE_BYTREE, LOWER_ALPHA, UPPER_ALPHA
 
