@@ -16,6 +16,8 @@ from excel_writer import ExcelWriter
 from cell_map import CELL_MAP
 from text_builder import TextBuilder
 from datetime import datetime # 日付取得用
+from sklearn.metrics import mean_absolute_error
+import pandas as pd
 
 def main():
     """
@@ -64,6 +66,46 @@ def main():
         # 児童ごとの過去データを用いて個別のLightGBMモデルを学習
         model = train_model(X, y)
         models[child] = model # 学習済みモデルを児童名と紐づけて保持
+        # ==========================================
+        # ■■ モデル評価（開発時確認用）
+        # ==========================================
+        # 学習データに対する予測精度(MAE)を確認
+        # ※モデルの動作確認を目的とした評価
+
+        feature_names = [
+            "mean",
+            "std",
+            "maximum",
+            "minimum",
+            "trend",
+            "diff_last",
+            "increasing",
+            "decreasing",
+        ]
+
+        X_df = pd.DataFrame(X, columns=feature_names)
+
+        pred = model["median"].predict(X_df)
+
+        mae = mean_absolute_error(y, pred)
+
+        print(f"\n===== {child} =====")
+        print(f"MAE : {mae:.2f}")
+
+        # ==========================================
+        # ■ 特徴量重要度の確認（開発時確認用）
+        # ==========================================
+        # LightGBMが予測時に重視した特徴量を確認
+
+        importance = pd.Series(
+            model["median"].feature_importances_,
+            index=feature_names
+        ).sort_values(ascending=False)
+
+        print("\n特徴量重要度")
+
+        for name, score in importance.items():
+            print(f"{name:<12} : {score}")
 
     print("学習完了")
 
