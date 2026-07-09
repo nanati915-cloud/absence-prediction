@@ -65,7 +65,6 @@ def main():
 
         # 児童ごとの過去データを用いて個別のLightGBMモデルを学習
         model = train_model(X, y)
-        models[child] = model # 学習済みモデルを児童名と紐づけて保持
         # ==========================================
         # ■■ モデル評価（開発時確認用）
         # ==========================================
@@ -106,6 +105,11 @@ def main():
 
         for name, score in importance.items():
             print(f"{name:<12} : {score}")
+            # 学習済みモデルと評価指標を保持
+        models[child] = {
+            "model": model,
+            "mae": mae,
+        }
 
     print("学習完了")
 
@@ -119,7 +123,15 @@ def main():
 
         # 直近のデータを起点に、configで定義された24ヶ月（2年間）先までの
         # 未来の月間欠席日数を、AIモデルを用いて再帰的にシミュレーション予測します。
-        result = run_future_prediction(models[child], monthly_df, child)
+        result = run_future_prediction(
+            models[child]["model"],
+            monthly_df,
+            child
+        )
+
+        # 学習データに対する予測精度(MAE)を結果へ追加
+        result["mae"] = models[child]["mae"]
+
         results[child] = result
 
     print("未来予測完了")

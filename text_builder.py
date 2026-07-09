@@ -293,6 +293,11 @@ class TextBuilder:
         )
 
         total = len(results)
+        mae_text = "、".join(
+            f"{child}：{results[child]['mae']:.2f}日"
+            for child in CHILDREN
+            if child in results and results[child].get("mae") is not None
+        )
 
         text = (
             f"AIによる予測では、対象児童{total}名の平均欠席日数は約{average:.1f}日と推定された。"
@@ -306,6 +311,11 @@ class TextBuilder:
             text += (
                 f"{stable_count}名は予測期間内に安定化が見込まれ、"
                 f"{total - stable_count}名は継続的な支援が必要と予測された。"
+            )
+
+        if mae_text:
+            text += (
+                f"\nまた、学習データに対する予測精度（平均絶対誤差：MAE）は{mae_text}であり、学習データの傾向を概ね再現できていることを確認した。"
             )
 
         return text
