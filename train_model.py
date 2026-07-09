@@ -15,19 +15,19 @@ def _create_model(objective="regression", alpha=None):
     params = {
         # 学習目的（regression：通常回帰、quantile：分位点回帰）
         "objective": objective,
-        # 決定木を何本作るか（増やすと精度↑・学習時間↑）
+        # 作成する決定木の数（増やすと表現力が上がるが、学習時間も増加する）
         "n_estimators": N_ESTIMATORS,
-        # 1回の学習でどれだけ修正するか（小さいほどゆっくり・安定して学習）
+        # 各決定木の予測結果をどれだけ反映するか（小さいほど学習は緩やかになる）
         "learning_rate": LEARNING_RATE,
         # 決定木の深さ（深いほど複雑なルールを学習するが過学習しやすい）
         "max_depth": MAX_DEPTH,
-        # 木の葉（終端ノード）の最大数（増やすと複雑な予測が可能）
+        # 1本の決定木が持つ葉（終端ノード）の最大数（増やすと複雑なパターンを学習できるが過学習しやすい）
         "num_leaves": NUM_LEAVES,
-        # 1つの葉に必要な最小データ数（小さいほど細かく学習する）
+        # 葉を作るために必要な最小データ数（小さいほど複雑なモデルになりやすい）
         "min_child_samples": MIN_CHILD_SAMPLES,
-        # 各決定木の学習に使うデータの割合（1.0なら全データ、0.8なら80%　小さくすると過学習を抑えやすい）
+        # 各決定木の学習に使用するデータ割合（小さくすると過学習抑制につながる）
         "subsample": SUBSAMPLE,
-        # 各決定木の学習に使う特徴量の割合（1.0なら全特徴量、0.8なら80%　小さくすると過学習を抑えやすい）
+        # 各決定木で使用する特徴量の割合（小さくすると過学習を抑えやすい）
         "colsample_bytree": COLSAMPLE_BYTREE,
         # 乱数を固定（毎回同じ学習結果を再現できる）
         "random_state": RANDOM_STATE,

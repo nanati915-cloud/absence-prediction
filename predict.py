@@ -1,6 +1,8 @@
 """
 学習済みモデルを用いて将来の欠席日数を予測する。
-安定時期の判定や予測区間の算出を行う。
+
+予測値の算出、予測区間の生成、
+設定した基準に基づく安定期間の判定を行う。
 """
 
 import numpy as np
@@ -12,7 +14,7 @@ from config import PREDICT_MONTHS, STABLE_THRESHOLD, STABLE_MONTHS , WINDOW_SIZE
 # ==========================================================
 def build_features(window):
     """
-    【概要】過去6ヶ月の窓データから、推論（予測）に必要な統計特徴量をリアルタイムに計算します。
+    予測時に使用する直近データから統計特徴量を生成する。
     """
     window = np.array(window, dtype=float)
 
@@ -45,7 +47,7 @@ def build_features(window):
 
 
 # ==========================================================
-# ■ 2. 健康安定時期の自動検出
+# ■ 2. 欠席日数基準を満たす期間の検出
 # ==========================================================
 def detect_stable_month(series,
                         threshold=STABLE_THRESHOLD,

@@ -17,10 +17,10 @@ def savefig(filename):
 # ==========================================================
 def create_line_graph(df, x_col, title, filename):
     """
-    【概要】月齢、学年、登園期間などの『連続的な変化トレンド』を抽出するための折れ線グラフを生成。
-    複数児童のデータを1つのグラフに動的プロットし、個人のノイズに囚われない全体の傾向線を一目で比較可能にしています。
+    月齢、学年、登園期間などの変化を確認するための折れ線グラフを生成する。
+    複数児童のデータを同一グラフ上に表示し、児童ごとの推移を比較可能にする。
     """
-    # Excel報告書のセル幅（520px）にジャストフィットするアスペクト比（10:4）を黄金比として採用
+    # Excel報告書への貼り付けサイズを考慮し、横長のアスペクト比で設定
     plt.figure(figsize=(10, 4))
     x = df[x_col].astype(str)
 
@@ -35,7 +35,7 @@ def create_line_graph(df, x_col, title, filename):
     plt.xticks(rotation=90) # X軸のラベル（〇歳児クラス、年月など）の重なりを防ぐ90度回転処理
     plt.legend()
     plt.tight_layout() # レイアウトの自動最適化（ラベルの端が切れる現象を完全にシャットアウト）
-    plt.savefig(savefig(filename), dpi=200) # 印刷やExcel埋め込みに耐えうる、高解像度（DPI=200）での書き出し
+    plt.savefig(savefig(filename), dpi=200) # Excelへの貼り付け時に見やすいよう、高解像度（DPI=200）で保存
     plt.close()
 
 # ==========================================================
@@ -43,7 +43,7 @@ def create_line_graph(df, x_col, title, filename):
 # ==========================================================
 def create_bar_graph(df, x_col, title, filename):
     """
-    【概要】「何月に欠席が多いか」など、独立したカテゴリー間の『絶対量の差』を明快に比較するための並列棒グラフを生成。
+    カテゴリーごとの欠席日数の違いを比較する棒グラフを生成する。
     """
     plt.figure(figsize=(10, 4))
     x = np.arange(len(df))
@@ -66,7 +66,9 @@ def create_bar_graph(df, x_col, title, filename):
 # ■ 3. 統計グラフの一括制御タスク
 # ==========================================================
 def create_all_graphs(graph_data):
-    """メインロジックから呼び出され、過去統計の全5軸＋時系列推移の計6枚のグラフをワンストップで自動生成。"""
+    """
+    過去データの6種類の分析グラフを一括生成する。
+    """
     # 1. 分析① 月齢別
     create_line_graph(graph_data["age_graph"], "月齢", "月齢別欠席日数", "月齢別欠席日数.png")
     # 2. 分析② 学年別
@@ -85,9 +87,9 @@ def create_all_graphs(graph_data):
 # ==========================================================
 def create_future_risk_curve(result, child_name):
     """
-    【概要】AI（LightGBM）が24ヶ月先までシミュレーションした『未来の欠席リスク』をプロット。
+    AI（LightGBM）が24ヶ月先まで予測した欠席日数推移
     ただの線グラフではなく、AIモデル独自の基準値を下回った瞬間（安定開始月）を
-    赤い「赤垂直破線」で自動プロットし、現場に一目で改善時期を伝えるUXデザインを実現しています。
+    赤い垂直破線で自動プロットし、現場に一目で改善時期を伝えるUXデザインを実現しています。
     """
     future = result["future_series"]
     months = np.arange(1, len(future) + 1)
@@ -97,10 +99,10 @@ def create_future_risk_curve(result, child_name):
     plt.plot(months, future, marker="o", linewidth=2, label="予測欠席日数")
     
     # 【ビジュアル演出】予測線の下部をシアン調のグラデーション（fill_between）で塗り潰し、
-    # 報告書内での「未来の蓄積リスク」としての重大性を視覚的に強調
+    # 予測推移を見やすくするため、線の下部を塗りつぶして視認性を向上
     plt.fill_between(months, future, alpha=0.2)
     
-    # AIが算出した「安定化に到達する月」を検知し、予測線上にマイルストーン（垂直線）を動的マーク
+    # 予測値が設定した安定基準を満たす月を検出し、垂直線で表示
     stable = result["stable_month"]
     if stable is not None:
         plt.axvline(stable, color="red", linestyle="--", label=f"安定開始（{stable}ヶ月後）")
