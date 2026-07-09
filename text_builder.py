@@ -315,7 +315,7 @@ class TextBuilder:
 
         if mae_text:
             text += (
-                f"\nまた、学習データに対する予測精度（平均絶対誤差：MAE）は{mae_text}であり、学習データの傾向を概ね再現できていることを確認した。"
+                f"\nまた、モデルの学習状況を確認するため、学習データに対する予測誤差（平均絶対誤差：MAE）を算出した。その結果、MAEは{mae_text}であった。"
             )
 
         return text
