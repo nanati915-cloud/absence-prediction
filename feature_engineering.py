@@ -15,8 +15,9 @@ from config import IMPUTATION_METHOD, WINDOW_SIZE ,FEATURE_COUNT , MISSING_PERIO
 
 def remove_long_missing_period(series, threshold=MISSING_PERIOD_THRESHOLD):
     """
-    指定された期間以上連続する欠損期間を除外する。
-    入園前・一時退園などの対象外期間を削除する。
+    指定期間以上連続する欠損期間を除外する。
+
+    入園前や記録対象外期間など、分析対象外と考えられる期間の除去に利用する。
     """
 
     is_nan = series.isna()
@@ -79,13 +80,14 @@ def create_stability_dataset(monthly_df, child_name):
     X = []
     y = []
 
-    # トリミングした結果、入園後の在籍期間がウィンドウサイズ（6ヶ月）以下の場合はスキップ
+    # 入園後データが特徴量作成期間（6ヶ月）以下の場合はスキップ
     if len(series) <= WINDOW_SIZE:
         return np.empty((0, FEATURE_COUNT)), np.empty((0,))
 
     # ------------------------------------------------------
-    # 2. 特徴量エンジニアリング（統計的アプローチ）
+    # ■ 特徴量エンジニアリング（統計特徴量の作成）
     # ------------------------------------------------------
+    # ■ 教師あり学習用の目的変数生成
     for i in range(WINDOW_SIZE, len(series)):
         # 直近6ヶ月間のデータスライス（窓）を抽出
         window= series.iloc[i - WINDOW_SIZE:i]
